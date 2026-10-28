@@ -4,9 +4,11 @@ import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 import { format, addDays } from 'date-fns'
+import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Booking() {
   const { user, profile } = useAuth()
+  const { t, formatPrice, dateLocale } = useLanguage()
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [services, setServices] = useState([])
@@ -54,7 +56,7 @@ export default function Booking() {
       setAvailableSlots(data || [])
     } catch (error) {
       console.error('Error fetching slots:', error)
-      toast.error('Error fetching available slots')
+      toast.error(t('booking.slotsError'))
     }
   }
 
@@ -74,7 +76,7 @@ export default function Booking() {
       
       if (error) throw error
       
-      toast.success('Booking created successfully!')
+      toast.success(t('booking.success'))
       navigate('/my-bookings')
     } catch (error) {
       toast.error(error.message)
@@ -100,7 +102,7 @@ export default function Booking() {
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-8 text-center">Book Appointment</h1>
+        <h1 className="text-3xl font-bold text-white mb-8 text-center">{t('booking.title')}</h1>
         
         {/* Progress Steps */}
         <div className="flex justify-between mb-8">
@@ -110,11 +112,11 @@ export default function Booking() {
                 {s}
               </div>
               <span className="text-sm">
-                {s === 1 && 'Service'}
-                {s === 2 && 'Barber'}
-                {s === 3 && 'Date'}
-                {s === 4 && 'Time'}
-                {s === 5 && 'Confirm'}
+                {s === 1 && t('booking.step.service')}
+                {s === 2 && t('booking.step.barber')}
+                {s === 3 && t('booking.step.date')}
+                {s === 4 && t('booking.step.time')}
+                {s === 5 && t('booking.step.confirm')}
               </span>
             </div>
           ))}
@@ -124,7 +126,7 @@ export default function Booking() {
           {/* Step 1: Select Service */}
           {step === 1 && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Select Service</h2>
+              <h2 className="text-xl font-semibold mb-4">{t('booking.selectService')}</h2>
               <div className="space-y-3">
                 {services.map((service) => (
                   <div
@@ -140,10 +142,10 @@ export default function Booking() {
                       <div>
                         <h3 className="font-semibold text-white">{service.name}</h3>
                         <p className="text-gray-400 text-sm">{service.description}</p>
-                        <p className="text-gold-500 text-sm mt-1">{service.duration_minutes} min</p>
+                        <p className="text-gold-500 text-sm mt-1">{service.duration_minutes} {t('home.min')}</p>
                       </div>
                       <div className="text-gold-500 font-bold">
-                        {shopSettings?.currency || '$'}{service.price}
+                        {formatPrice(service.price)}
                       </div>
                     </div>
                   </div>
@@ -155,7 +157,7 @@ export default function Booking() {
           {/* Step 2: Select Barber */}
           {step === 2 && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Select Barber (Optional)</h2>
+              <h2 className="text-xl font-semibold mb-4">{t('booking.selectBarber')}</h2>
               <div className="space-y-3">
                 <div
                   onClick={() => setSelectedBarber(null)}
@@ -165,8 +167,8 @@ export default function Booking() {
                       : 'border-gray-600 hover:border-gold-400'
                   }`}
                 >
-                  <h3 className="font-semibold text-white">Any Available Barber</h3>
-                  <p className="text-gray-400 text-sm">First available appointment</p>
+                  <h3 className="font-semibold text-white">{t('booking.anyBarber')}</h3>
+                  <p className="text-gray-400 text-sm">{t('booking.anyBarberDesc')}</p>
                 </div>
                 {barbers.map((barber) => (
                   <div
@@ -198,7 +200,7 @@ export default function Booking() {
           {/* Step 3: Select Date */}
           {step === 3 && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Select Date</h2>
+              <h2 className="text-xl font-semibold mb-4">{t('booking.selectDate')}</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {dates.slice(0, 16).map((date) => (
                   <button
@@ -210,8 +212,8 @@ export default function Booking() {
                         : 'border-gray-600 hover:border-gold-400 text-white'
                     }`}
                   >
-                    <div className="font-semibold">{format(new Date(date + 'T00:00:00'), 'EEE')}</div>
-                    <div className="text-sm">{format(new Date(date + 'T00:00:00'), 'MMM d')}</div>
+                    <div className="font-semibold">{format(new Date(date + 'T00:00:00'), 'EEE', { locale: dateLocale })}</div>
+                    <div className="text-sm">{format(new Date(date + 'T00:00:00'), t('fmt.dayMonth'), { locale: dateLocale })}</div>
                   </button>
                 ))}
               </div>
@@ -221,9 +223,9 @@ export default function Booking() {
           {/* Step 4: Select Time */}
           {step === 4 && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Select Time</h2>
+              <h2 className="text-xl font-semibold mb-4">{t('booking.selectTime')}</h2>
               {availableSlots.length === 0 ? (
-                <p className="text-gray-400 text-center py-8">No available slots for this date</p>
+                <p className="text-gray-400 text-center py-8">{t('booking.noSlots')}</p>
               ) : (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {availableSlots.map((slot, idx) => (
@@ -252,21 +254,21 @@ export default function Booking() {
           {/* Step 5: Confirm */}
           {step === 5 && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Confirm Booking</h2>
+              <h2 className="text-xl font-semibold mb-4">{t('booking.confirmTitle')}</h2>
               <div className="space-y-4 mb-6">
                 <div className="bg-dark-700 p-4 rounded">
-                  <h3 className="font-semibold text-gold-500 mb-2">Booking Details</h3>
-                  <p className="text-white"><span className="text-gray-400">Service:</span> {selectedService?.name}</p>
-                  <p className="text-white"><span className="text-gray-400">Barber:</span> {selectedSlot?.barber_name || selectedBarber?.display_name}</p>
-                  <p className="text-white"><span className="text-gray-400">Date:</span> {format(new Date(selectedDate + 'T00:00:00'), 'EEEE, MMMM d, yyyy')}</p>
-                  <p className="text-white"><span className="text-gray-400">Time:</span> {format(new Date(selectedSlot?.slot_start), 'HH:mm')}</p>
-                  <p className="text-white"><span className="text-gray-400">Price:</span> {shopSettings?.currency || '$'}{selectedService?.price}</p>
+                  <h3 className="font-semibold text-gold-500 mb-2">{t('booking.details')}</h3>
+                  <p className="text-white"><span className="text-gray-400">{t('booking.service')}</span> {selectedService?.name}</p>
+                  <p className="text-white"><span className="text-gray-400">{t('booking.barber')}</span> {selectedSlot?.barber_name || selectedBarber?.display_name}</p>
+                  <p className="text-white"><span className="text-gray-400">{t('booking.date')}</span> {format(new Date(selectedDate + 'T00:00:00'), t('fmt.longDate'), { locale: dateLocale })}</p>
+                  <p className="text-white"><span className="text-gray-400">{t('booking.time')}</span> {format(new Date(selectedSlot?.slot_start), 'HH:mm')}</p>
+                  <p className="text-white"><span className="text-gray-400">{t('booking.price')}</span> {formatPrice(selectedService?.price)}</p>
                 </div>
 
                 {!user && (
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Full Name *</label>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">{t('booking.fullName')}</label>
                       <input
                         type="text"
                         className="input w-full"
@@ -276,7 +278,7 @@ export default function Booking() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Phone Number *</label>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">{t('booking.phone')}</label>
                       <input
                         type="tel"
                         className="input w-full"
@@ -289,7 +291,7 @@ export default function Booking() {
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Notes (Optional)</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">{t('booking.notes')}</label>
                   <textarea
                     className="input w-full"
                     rows="3"
@@ -308,7 +310,7 @@ export default function Booking() {
               disabled={step === 1}
               className="btn-secondary disabled:opacity-50"
             >
-              Back
+              {t('booking.back')}
             </button>
             {step < 5 ? (
               <button
@@ -316,7 +318,7 @@ export default function Booking() {
                 disabled={!canProceed()}
                 className="btn-primary disabled:opacity-50"
               >
-                Next
+                {t('booking.next')}
               </button>
             ) : (
               <button
@@ -324,7 +326,7 @@ export default function Booking() {
                 disabled={!canProceed() || loading}
                 className="btn-primary disabled:opacity-50"
               >
-                {loading ? 'Booking...' : 'Confirm Booking'}
+                {loading ? t('booking.booking') : t('booking.confirmBtn')}
               </button>
             )}
           </div>

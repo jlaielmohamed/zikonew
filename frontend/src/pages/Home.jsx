@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { useLanguage } from '../i18n/LanguageContext'
 import { Scissors, Clock, MapPin, Phone, Instagram, Facebook, ExternalLink } from 'lucide-react'
 
 // Shop location (pin from the shared Google Maps link)
@@ -10,6 +11,7 @@ const MAPS_LNG = 10.7804827
 const MAPS_EMBED_URL = `https://maps.google.com/maps?q=${MAPS_LAT},${MAPS_LNG}&z=17&output=embed`
 
 export default function Home() {
+  const { t, formatPrice } = useLanguage()
   const [shopSettings, setShopSettings] = useState(null)
   const [services, setServices] = useState([])
   const [barbers, setBarbers] = useState([])
@@ -43,10 +45,8 @@ export default function Home() {
     }
   }
 
-  const getDayName = (weekday) => {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-    return days[weekday]
-  }
+  const getDayName = (weekday) => t(`day.${weekday}`)
+  const hhmm = (time) => (time ? time.slice(0, 5) : '')
 
   if (loading) {
     return (
@@ -69,16 +69,16 @@ export default function Home() {
       <section className="relative bg-gradient-to-r from-dark-900 to-dark-800 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex justify-center mb-6">
-            <Scissors className="h-16 w-16 text-gold-500" />
+            <img src="/logo.jpg" alt={t('home.logoAlt')} className="h-32 w-32 rounded-full object-cover" />
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
             {shopSettings?.shop_name || 'ZIKO TEST VERSION'}
           </h1>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            {shopSettings?.description || 'Premium barbershop experience with skilled professionals'}
+            {shopSettings?.description || t('home.defaultDescription')}
           </p>
           <Link to="/booking" className="btn-primary text-lg px-8 py-3 inline-block">
-            Book Now
+            {t('home.bookNow')}
           </Link>
         </div>
       </section>
@@ -86,16 +86,16 @@ export default function Home() {
       {/* Services Section */}
       <section className="py-16 bg-dark-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12 text-white">Our Services</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-white">{t('home.services')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service) => (
               <div key={service.id} className="card hover:border-gold-500 transition-colors">
                 <h3 className="text-xl font-semibold text-white mb-2">{service.name}</h3>
                 <p className="text-gray-400 mb-4">{service.description}</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-gold-500 font-semibold">{service.duration_minutes} min</span>
+                  <span className="text-gold-500 font-semibold">{service.duration_minutes} {t('home.min')}</span>
                   <span className="text-2xl font-bold text-gold-500">
-                    {shopSettings?.currency || '$'}{service.price}
+                    {formatPrice(service.price)}
                   </span>
                 </div>
               </div>
@@ -107,7 +107,7 @@ export default function Home() {
       {/* Barbers Section */}
       <section className="py-16 bg-dark-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12 text-white">Our Barbers</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-white">{t('home.barbers')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {barbers.map((barber) => (
               <div key={barber.id} className="card text-center">
@@ -135,7 +135,7 @@ export default function Home() {
       {reviews.length > 0 && (
         <section className="py-16 bg-dark-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-center mb-12 text-white">Customer Reviews</h2>
+            <h2 className="text-3xl font-bold text-center mb-12 text-white">{t('home.reviews')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {reviews.map((review) => (
                 <div key={review.id} className="card">
@@ -146,8 +146,8 @@ export default function Home() {
                   </div>
                   <p className="text-gray-300 mb-4">{review.comment}</p>
                   <div className="text-sm text-gray-400">
-                    <p className="font-semibold">{review.profiles?.full_name || 'Customer'}</p>
-                    {review.barbers && <p>by {review.barbers.display_name}</p>}
+                    <p className="font-semibold">{review.profiles?.full_name || t('home.customer')}</p>
+                    {review.barbers && <p>{t('home.by')} {review.barbers.display_name}</p>}
                   </div>
                 </div>
               ))}
@@ -164,14 +164,14 @@ export default function Home() {
             <div>
               <h2 className="text-3xl font-bold mb-6 text-white flex items-center">
                 <Clock className="h-8 w-8 text-gold-500 mr-3" />
-                Opening Hours
+                {t('home.openingHours')}
               </h2>
               <div className="card">
                 {shopHours.map((hours) => (
                   <div key={hours.weekday} className="flex justify-between py-2 border-b border-gray-700 last:border-b-0">
                     <span className="text-gray-300">{getDayName(hours.weekday)}</span>
                     <span className="text-white">
-                      {hours.is_open ? `${hours.open_time} - ${hours.close_time}` : 'Closed'}
+                      {hours.is_open ? `${hhmm(hours.open_time)} - ${hhmm(hours.close_time)}` : t('home.closed')}
                     </span>
                   </div>
                 ))}
@@ -182,7 +182,7 @@ export default function Home() {
             <div>
               <h2 className="text-3xl font-bold mb-6 text-white flex items-center">
                 <MapPin className="h-8 w-8 text-gold-500 mr-3" />
-                Location & Contact
+                {t('home.locationContact')}
               </h2>
               <div className="card space-y-4">
                 {shopSettings?.address && (
@@ -217,7 +217,7 @@ export default function Home() {
               {/* Map */}
               <div className="mt-4 rounded-lg overflow-hidden border border-gray-700">
                 <iframe
-                  title="Shop location on Google Maps"
+                  title={t('home.mapTitle')}
                   src={MAPS_EMBED_URL}
                   className="w-full h-64 block"
                   loading="lazy"
@@ -231,7 +231,7 @@ export default function Home() {
                   className="flex items-center justify-center gap-2 bg-dark-800 hover:bg-dark-700 text-gold-500 font-semibold py-3 transition-colors"
                 >
                   <ExternalLink className="h-4 w-4" />
-                  Open in Google Maps
+                  {t('home.openMaps')}
                 </a>
               </div>
             </div>
@@ -242,10 +242,10 @@ export default function Home() {
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-r from-gold-600 to-gold-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-black mb-4">Ready to Look Your Best?</h2>
-          <p className="text-xl text-black mb-8">Book your appointment today</p>
+          <h2 className="text-3xl font-bold text-black mb-4">{t('home.ctaTitle')}</h2>
+          <p className="text-xl text-black mb-8">{t('home.ctaText')}</p>
           <Link to="/booking" className="bg-black text-white hover:bg-gray-900 font-semibold py-3 px-8 rounded transition-colors inline-block">
-            Book Now
+            {t('home.bookNow')}
           </Link>
         </div>
       </section>

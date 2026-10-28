@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { Calendar, DollarSign, Users, Scissors, Clock } from 'lucide-react'
 import { format } from 'date-fns'
+import { useLanguage } from '../../i18n/LanguageContext'
 
 export default function Overview() {
+  const { t, formatPrice } = useLanguage()
   const [stats, setStats] = useState(null)
   const [todayBookings, setTodayBookings] = useState([])
   const [loading, setLoading] = useState(true)
@@ -39,20 +41,20 @@ export default function Overview() {
   }
 
   if (loading) {
-    return <div className="text-white">Loading...</div>
+    return <div className="text-white">{t('a.loading')}</div>
   }
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-white mb-6">Overview</h1>
+      <h1 className="text-3xl font-bold text-white mb-6">{t('a.menu.overview')}</h1>
       
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Revenue (30 days)</p>
-              <p className="text-2xl font-bold text-gold-500">${stats?.revenue || 0}</p>
+              <p className="text-gray-400 text-sm">{t('a.ov.revenue30')}</p>
+              <p className="text-2xl font-bold text-gold-500">{formatPrice(stats?.revenue || 0)}</p>
             </div>
             <DollarSign className="h-8 w-8 text-gold-500" />
           </div>
@@ -61,7 +63,7 @@ export default function Overview() {
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Today's Appointments</p>
+              <p className="text-gray-400 text-sm">{t('a.ov.today')}</p>
               <p className="text-2xl font-bold text-white">{todayBookings.length}</p>
             </div>
             <Calendar className="h-8 w-8 text-gold-500" />
@@ -71,7 +73,7 @@ export default function Overview() {
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Pending</p>
+              <p className="text-gray-400 text-sm">{t('status.pending')}</p>
               <p className="text-2xl font-bold text-yellow-500">
                 {stats?.bookings_by_status?.pending || 0}
               </p>
@@ -83,7 +85,7 @@ export default function Overview() {
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Completed</p>
+              <p className="text-gray-400 text-sm">{t('status.completed')}</p>
               <p className="text-2xl font-bold text-green-500">
                 {stats?.bookings_by_status?.completed || 0}
               </p>
@@ -96,9 +98,9 @@ export default function Overview() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Today's Appointments */}
         <div className="card">
-          <h2 className="text-xl font-semibold text-white mb-4">Today's Appointments</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">{t('a.ov.today')}</h2>
           {todayBookings.length === 0 ? (
-            <p className="text-gray-400">No appointments today</p>
+            <p className="text-gray-400">{t('a.ov.noToday')}</p>
           ) : (
             <div className="space-y-3">
               {todayBookings.map((booking) => (
@@ -108,7 +110,7 @@ export default function Overview() {
                       {booking.profiles?.full_name || booking.guest_name}
                     </p>
                     <p className="text-gray-400 text-sm">
-                      {booking.services?.name} with {booking.barbers?.display_name}
+                      {booking.services?.name} {t('a.with')} {booking.barbers?.display_name}
                     </p>
                   </div>
                   <div className="text-right">
@@ -118,7 +120,7 @@ export default function Overview() {
                       booking.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500' :
                       'bg-gray-500/10 text-gray-500'
                     }`}>
-                      {booking.status}
+                      {t(`status.${booking.status}`)}
                     </span>
                   </div>
                 </div>
@@ -129,7 +131,7 @@ export default function Overview() {
 
         {/* Top Services */}
         <div className="card">
-          <h2 className="text-xl font-semibold text-white mb-4">Top Services</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">{t('a.ov.topServices')}</h2>
           {stats?.top_services?.length > 0 ? (
             <div className="space-y-3">
               {stats.top_services.map((service, idx) => (
@@ -139,14 +141,14 @@ export default function Overview() {
                     <span className="text-white">{service.name}</span>
                   </div>
                   <div className="text-right">
-                    <p className="text-white">{service.count} bookings</p>
-                    <p className="text-gold-500 text-sm">${service.revenue}</p>
+                    <p className="text-white">{service.count} {t('a.bookings')}</p>
+                    <p className="text-gold-500 text-sm">{formatPrice(service.revenue)}</p>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-400">No data yet</p>
+            <p className="text-gray-400">{t('a.ov.noData')}</p>
           )}
         </div>
       </div>

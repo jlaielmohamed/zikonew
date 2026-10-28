@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { Star } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useLanguage } from '../../i18n/LanguageContext'
 
 export default function Reviews() {
+  const { t } = useLanguage()
   const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -20,18 +22,18 @@ export default function Reviews() {
   const toggleVisibility = async (id, current) => {
     const { error } = await supabase.from('reviews').update({ is_visible: !current }).eq('id', id)
     if (!error) {
-      toast.success('Updated')
+      toast.success(t('a.updated'))
       fetchReviews()
     }
   }
 
-  if (loading) return <div className="text-white">Loading...</div>
+  if (loading) return <div className="text-white">{t('a.loading')}</div>
 
   return (
     <div>
       <h1 className="text-3xl font-bold text-white mb-6 flex items-center">
         <Star className="h-8 w-8 text-gold-500 mr-3" />
-        Reviews
+        {t('a.menu.reviews')}
       </h1>
 
       <div className="space-y-4">
@@ -50,7 +52,7 @@ export default function Reviews() {
                 </p>
               </div>
               <button onClick={() => toggleVisibility(review.id, review.is_visible)} className={`px-2 py-1 rounded text-xs ${review.is_visible ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-500'}`}>
-                {review.is_visible ? 'Visible' : 'Hidden'}
+                {review.is_visible ? t('a.rv.visible') : t('a.rv.hidden')}
               </button>
             </div>
           </div>

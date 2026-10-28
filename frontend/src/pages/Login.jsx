@@ -2,13 +2,14 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import toast from 'react-hot-toast'
-import { Scissors } from 'lucide-react'
+import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const { signIn } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
@@ -20,7 +21,7 @@ export default function Login() {
     if (error) {
       toast.error(error.message)
     } else {
-      toast.success('Login successful!')
+      toast.success(t('login.success'))
       navigate('/')
     }
     
@@ -32,13 +33,13 @@ export default function Login() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center">
-            <Scissors className="h-12 w-12 text-gold-500" />
+            <img src="/logo.jpg" alt="Ziko Hairstyle" className="h-20 w-20 rounded-full object-cover" />
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-white">Sign in to your account</h2>
+          <h2 className="mt-6 text-3xl font-bold text-white">{t('login.title')}</h2>
           <p className="mt-2 text-sm text-gray-400">
-            Or{' '}
+            {t('login.or')}{' '}
             <Link to="/register" className="text-gold-500 hover:text-gold-400">
-              create a new account
+              {t('login.createLink')}
             </Link>
           </p>
         </div>
@@ -46,7 +47,7 @@ export default function Login() {
           <div className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300">
-                Email address
+                {t('auth.email')}
               </label>
               <input
                 id="email"
@@ -60,7 +61,7 @@ export default function Login() {
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-300">
-                Password
+                {t('auth.password')}
               </label>
               <input
                 id="password"
@@ -80,7 +81,7 @@ export default function Login() {
               disabled={loading}
               className="btn-primary w-full py-3 disabled:opacity-50"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? t('login.signingIn') : t('login.signIn')}
             </button>
           </div>
         </form>

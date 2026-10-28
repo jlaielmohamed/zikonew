@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 import { Plus } from 'lucide-react'
+import { useLanguage } from '../../i18n/LanguageContext'
 
 export default function Barbers() {
+  const { t } = useLanguage()
   const [barbers, setBarbers] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -20,19 +22,19 @@ export default function Barbers() {
   const toggleActive = async (id, current) => {
     const { error } = await supabase.from('barbers').update({ is_active: !current }).eq('id', id)
     if (!error) {
-      toast.success('Updated')
+      toast.success(t('a.updated'))
       fetchBarbers()
     }
   }
 
-  if (loading) return <div className="text-white">Loading...</div>
+  if (loading) return <div className="text-white">{t('a.loading')}</div>
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-white">Barbers</h1>
+        <h1 className="text-3xl font-bold text-white">{t('a.menu.barbers')}</h1>
         <button className="btn-primary flex items-center">
-          <Plus className="h-4 w-4 mr-2" /> Add Barber
+          <Plus className="h-4 w-4 mr-2" /> {t('a.br.add')}
         </button>
       </div>
 
@@ -40,10 +42,10 @@ export default function Barbers() {
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-700">
-              <th className="text-left text-gray-400 pb-3">Name</th>
-              <th className="text-left text-gray-400 pb-3">Bio</th>
-              <th className="text-left text-gray-400 pb-3">Status</th>
-              <th className="text-left text-gray-400 pb-3">Actions</th>
+              <th className="text-left text-gray-400 pb-3">{t('a.name')}</th>
+              <th className="text-left text-gray-400 pb-3">{t('a.br.bio')}</th>
+              <th className="text-left text-gray-400 pb-3">{t('a.status')}</th>
+              <th className="text-left text-gray-400 pb-3">{t('a.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -53,11 +55,11 @@ export default function Barbers() {
                 <td className="py-3 text-gray-300 max-w-xs truncate">{barber.bio}</td>
                 <td className="py-3">
                   <button onClick={() => toggleActive(barber.id, barber.is_active)} className={`px-2 py-1 rounded text-xs ${barber.is_active ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-500'}`}>
-                    {barber.is_active ? 'Active' : 'Inactive'}
+                    {barber.is_active ? t('a.active') : t('a.inactive')}
                   </button>
                 </td>
                 <td className="py-3">
-                  <button className="text-xs bg-blue-500 text-white px-2 py-1 rounded">Edit</button>
+                  <button className="text-xs bg-blue-500 text-white px-2 py-1 rounded">{t('a.edit')}</button>
                 </td>
               </tr>
             ))}

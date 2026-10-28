@@ -3,8 +3,10 @@ import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 import { format } from 'date-fns'
 import { Check, X, Edit, Calendar } from 'lucide-react'
+import { useLanguage } from '../../i18n/LanguageContext'
 
 export default function Appointments() {
+  const { t, formatPrice, dateLocale } = useLanguage()
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
@@ -44,7 +46,7 @@ export default function Appointments() {
       setBookings(data || [])
     } catch (error) {
       console.error('Error fetching bookings:', error)
-      toast.error('Error fetching bookings')
+      toast.error(t('my.fetchError'))
     } finally {
       setLoading(false)
     }
@@ -53,7 +55,7 @@ export default function Appointments() {
   const handleDecide = async (bookingId, decision) => {
     let reason = null
     if (decision === 'deny') {
-      reason = prompt('Reason for denial (optional):')
+      reason = prompt(t('a.ap.denyPrompt'))
     }
     
     try {
@@ -63,7 +65,7 @@ export default function Appointments() {
         reason: reason
       })
       if (error) throw error
-      toast.success(`Booking ${decision}ed successfully`)
+      toast.success(decision === 'accept' ? t('a.ap.accepted') : t('a.ap.denied'))
       fetchBookings()
     } catch (error) {
       toast.error(error.message)
@@ -71,12 +73,12 @@ export default function Appointments() {
   }
 
   const handleCancel = async (bookingId) => {
-    if (!confirm('Are you sure you want to cancel this booking?')) return
+    if (!confirm(t('my.confirmCancel'))) return
     
     try {
       const { error } = await supabase.rpc('cancel_booking', { booking_id: bookingId })
       if (error) throw error
-      toast.success('Booking cancelled successfully')
+      toast.success(t('my.cancelled'))
       fetchBookings()
     } catch (error) {
       toast.error(error.message)
@@ -90,7 +92,7 @@ export default function Appointments() {
         .update({ status })
         .eq('id', bookingId)
       if (error) throw error
-      toast.success('Status updated')
+      toast.success(t('a.ap.statusUpdated'))
       fetchBookings()
     } catch (error) {
       toast.error(error.message)
@@ -108,12 +110,12 @@ export default function Appointments() {
   })
 
   if (loading) {
-    return <div className="text-white">Loading...</div>
+    return <div className="text-white">{t('a.loading')}</div>
   }
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-white mb-6">Appointments</h1>
+      <h1 className="text-3xl font-bold text-white mb-6">{t('a.menu.appointments')}</h1>
       
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <select
@@ -121,17 +123,17 @@ export default function Appointments() {
           onChange={(e) => setFilter(e.target.value)}
           className="input"
         >
-          <option value="all">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="accepted">Accepted</option>
-          <option value="completed">Completed</option>
-          <option value="denied">Denied</option>
-          <option value="cancelled">Cancelled</option>
-          <option value="no_show">No Show</option>
+          <option value="all">{t('a.ap.allStatus')}</option>
+          <option value="pending">{t('status.pending')}</option>
+          <option value="accepted">{t('status.accepted')}</option>
+          <option value="completed">{t('status.completed')}</option>
+          <option value="denied">{t('status.denied')}</option>
+          <option value="cancelled">{t('status.cancelled')}</option>
+          <option value="no_show">{t('status.no_show')}</option>
         </select>
         <input
           type="text"
-          placeholder="Search by name or phone..."
+          placeholder={t('a.ap.search')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="input flex-1"
@@ -142,13 +144,13 @@ export default function Appointments() {
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-700">
-              <th className="text-left text-gray-400 pb-3">Customer</th>
-              <th className="text-left text-gray-400 pb-3">Service</th>
-              <th className="text-left text-gray-400 pb-3">Barber</th>
-              <th className="text-left text-gray-400 pb-3">Date & Time</th>
-              <th className="text-left text-gray-400 pb-3">Status</th>
-              <th className="text-left text-gray-400 pb-3">Price</th>
-              <th className="text-left text-gray-400 pb-3">Actions</th>
+              <th className="text-left text-gray-400 pb-3">{t('a.ap.customer')}</th>
+              <th className="text-left text-gray-400 pb-3">{t('a.ap.service')}</th>
+              <th className="text-left text-gray-400 pb-3">{t('a.ap.barber')}</th>
+              <th className="text-left text-gray-400 pb-3">{t('a.ap.dateTime')}</th>
+              <th className="text-left text-gray-400 pb-3">{t('a.status')}</th>
+              <th className="text-left text-gray-400 pb-3">{t('a.price')}</th>
+              <th className="text-left text-gray-400 pb-3">{t('a.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -168,7 +170,7 @@ export default function Appointments() {
                 <td className="py-3 text-white">{booking.barbers?.display_name}</td>
                 <td className="py-3">
                   <div>
-                    <p className="text-white">{format(new Date(booking.starts_at), 'MMM d, yyyy')}</p>
+                    <p className="text-white">{format(new Date(booking.starts_at), t('fmt.shortDate'), { locale: dateLocale })}</p>
                     <p className="text-gray-400 text-sm">{format(new Date(booking.starts_at), 'HH:mm')}</p>
                   </div>
                 </td>
@@ -181,10 +183,10 @@ export default function Appointments() {
                     booking.status === 'completed' ? 'bg-blue-500/10 text-blue-500' :
                     'bg-red-600/10 text-red-600'
                   }`}>
-                    {booking.status}
+                    {t(`status.${booking.status}`)}
                   </span>
                 </td>
-                <td className="py-3 text-gold-500">${booking.price_at_booking}</td>
+                <td className="py-3 text-gold-500">{formatPrice(booking.price_at_booking)}</td>
                 <td className="py-3">
                   <div className="flex space-x-2">
                     {booking.status === 'pending' && (
@@ -192,14 +194,14 @@ export default function Appointments() {
                         <button
                           onClick={() => handleDecide(booking.id, 'accept')}
                           className="p-1 text-green-500 hover:bg-green-500/10 rounded"
-                          title="Accept"
+                          title={t('a.ap.accept')}
                         >
                           <Check className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDecide(booking.id, 'deny')}
                           className="p-1 text-red-500 hover:bg-red-500/10 rounded"
-                          title="Deny"
+                          title={t('a.ap.deny')}
                         >
                           <X className="h-4 w-4" />
                         </button>
@@ -211,13 +213,13 @@ export default function Appointments() {
                           onClick={() => handleUpdateStatus(booking.id, 'completed')}
                           className="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
                         >
-                          Complete
+                          {t('a.ap.complete')}
                         </button>
                         <button
                           onClick={() => handleUpdateStatus(booking.id, 'no_show')}
                           className="text-xs bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
                         >
-                          No Show
+                          {t('a.ap.noShow')}
                         </button>
                       </>
                     )}
@@ -226,7 +228,7 @@ export default function Appointments() {
                         onClick={() => handleCancel(booking.id)}
                         className="text-xs bg-gray-600 text-white px-2 py-1 rounded hover:bg-gray-700"
                       >
-                        Cancel
+                        {t('a.ap.cancel')}
                       </button>
                     )}
                   </div>

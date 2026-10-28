@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import toast from 'react-hot-toast'
-import { Scissors } from 'lucide-react'
+import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Register() {
   const [email, setEmail] = useState('')
@@ -10,6 +10,7 @@ export default function Register() {
   const [fullName, setFullName] = useState('')
   const [loading, setLoading] = useState(false)
   const { signUp } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
@@ -21,7 +22,7 @@ export default function Register() {
     if (error) {
       toast.error(error.message)
     } else {
-      toast.success('Account created successfully!')
+      toast.success(t('register.success'))
       navigate('/')
     }
     
@@ -33,13 +34,13 @@ export default function Register() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center">
-            <Scissors className="h-12 w-12 text-gold-500" />
+            <img src="/logo.jpg" alt="Ziko Hairstyle" className="h-20 w-20 rounded-full object-cover" />
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-white">Create your account</h2>
+          <h2 className="mt-6 text-3xl font-bold text-white">{t('register.title')}</h2>
           <p className="mt-2 text-sm text-gray-400">
-            Or{' '}
+            {t('login.or')}{' '}
             <Link to="/login" className="text-gold-500 hover:text-gold-400">
-              sign in to existing account
+              {t('register.signInLink')}
             </Link>
           </p>
         </div>
@@ -47,7 +48,7 @@ export default function Register() {
           <div className="space-y-4">
             <div>
               <label htmlFor="fullName" className="block text-sm font-medium text-gray-300">
-                Full Name
+                {t('auth.fullName')}
               </label>
               <input
                 id="fullName"
@@ -61,7 +62,7 @@ export default function Register() {
             </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300">
-                Email address
+                {t('auth.email')}
               </label>
               <input
                 id="email"
@@ -75,7 +76,7 @@ export default function Register() {
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-300">
-                Password
+                {t('auth.password')}
               </label>
               <input
                 id="password"
@@ -95,7 +96,7 @@ export default function Register() {
               disabled={loading}
               className="btn-primary w-full py-3 disabled:opacity-50"
             >
-              {loading ? 'Creating account...' : 'Create account'}
+              {loading ? t('register.creating') : t('register.create')}
             </button>
           </div>
         </form>

@@ -14,21 +14,23 @@ import Customers from './Customers'
 import ShopSettings from './ShopSettings'
 import Reviews from './Reviews'
 import Reports from './Reports'
+import { useLanguage } from '../../i18n/LanguageContext'
 
 const menuItems = [
-  { path: '/admin', label: 'Overview', icon: BarChart3 },
-  { path: '/admin/appointments', label: 'Appointments', icon: Calendar },
-  { path: '/admin/services', label: 'Services', icon: Scissors },
-  { path: '/admin/barbers', label: 'Barbers', icon: Users },
-  { path: '/admin/working-time', label: 'Working Time', icon: Clock },
-  { path: '/admin/customers', label: 'Customers', icon: Users },
-  { path: '/admin/settings', label: 'Shop Settings', icon: Settings },
-  { path: '/admin/reviews', label: 'Reviews', icon: Star },
-  { path: '/admin/reports', label: 'Reports', icon: FileText },
+  { path: '/admin', labelKey: 'a.menu.overview', icon: BarChart3 },
+  { path: '/admin/appointments', labelKey: 'a.menu.appointments', icon: Calendar },
+  { path: '/admin/services', labelKey: 'a.menu.services', icon: Scissors },
+  { path: '/admin/barbers', labelKey: 'a.menu.barbers', icon: Users },
+  { path: '/admin/working-time', labelKey: 'a.menu.workingTime', icon: Clock },
+  { path: '/admin/customers', labelKey: 'a.menu.customers', icon: Users },
+  { path: '/admin/settings', labelKey: 'a.menu.settings', icon: Settings },
+  { path: '/admin/reviews', labelKey: 'a.menu.reviews', icon: Star },
+  { path: '/admin/reports', labelKey: 'a.menu.reports', icon: FileText },
 ]
 
 export default function AdminDashboard() {
   const location = useLocation()
+  const { t } = useLanguage()
   const [pendingCount, setPendingCount] = useState(0)
 
   useEffect(() => {
@@ -64,7 +66,7 @@ export default function AdminDashboard() {
         {/* Sidebar */}
         <div className="w-64 bg-dark-800 min-h-screen border-r border-gray-700">
           <div className="p-4 border-b border-gray-700">
-            <h2 className="text-xl font-bold text-gold-500">Admin Dashboard</h2>
+            <h2 className="text-xl font-bold text-gold-500">{t('nav.adminDashboard')}</h2>
           </div>
           <nav className="mt-4">
             {menuItems.map((item) => {
@@ -79,7 +81,7 @@ export default function AdminDashboard() {
                   }`}
                 >
                   <Icon className="h-5 w-5 mr-3" />
-                  <span>{item.label}</span>
+                  <span>{t(item.labelKey)}</span>
                   {item.path === '/admin/appointments' && pendingCount > 0 && (
                     <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1 flex items-center">
                       <Bell className="h-3 w-3 mr-1" />
