@@ -46,9 +46,9 @@ export default function Booking() {
   const fetchSlots = async () => {
     try {
       const { data, error } = await supabase.rpc('get_available_slots', {
-        barber_id: selectedBarber?.id || null,
-        service_id: selectedService.id,
-        date: selectedDate
+        p_barber_id: selectedBarber?.id || null,
+        p_service_id: selectedService.id,
+        p_date: selectedDate
       })
       if (error) throw error
       setAvailableSlots(data || [])
