@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { Scissors, Clock, MapPin, Phone, Instagram, Facebook } from 'lucide-react'
+import { Scissors, Clock, MapPin, Phone, Instagram, Facebook, ExternalLink } from 'lucide-react'
+
+// Shop location (pin from the shared Google Maps link)
+const MAPS_LINK = 'https://maps.app.goo.gl/FCTHJ7Th82wfenwX9'
+const MAPS_LAT = 34.7909844
+const MAPS_LNG = 10.7804827
+const MAPS_EMBED_URL = `https://maps.google.com/maps?q=${MAPS_LAT},${MAPS_LNG}&z=17&output=embed`
 
 export default function Home() {
   const [shopSettings, setShopSettings] = useState(null)
@@ -206,6 +212,27 @@ export default function Home() {
                     <p className="text-white">{shopSettings.facebook}</p>
                   </div>
                 )}
+              </div>
+
+              {/* Map */}
+              <div className="mt-4 rounded-lg overflow-hidden border border-gray-700">
+                <iframe
+                  title="Shop location on Google Maps"
+                  src={MAPS_EMBED_URL}
+                  className="w-full h-64 block"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                />
+                <a
+                  href={MAPS_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 bg-dark-800 hover:bg-dark-700 text-gold-500 font-semibold py-3 transition-colors"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Open in Google Maps
+                </a>
               </div>
             </div>
           </div>
