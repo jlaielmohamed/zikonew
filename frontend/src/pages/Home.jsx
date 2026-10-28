@@ -7,7 +7,6 @@ export default function Home() {
   const [shopSettings, setShopSettings] = useState(null)
   const [services, setServices] = useState([])
   const [barbers, setBarbers] = useState([])
-  const [gallery, setGallery] = useState([])
   const [reviews, setReviews] = useState([])
   const [shopHours, setShopHours] = useState([])
   const [loading, setLoading] = useState(true)
@@ -18,11 +17,10 @@ export default function Home() {
 
   const fetchData = async () => {
     try {
-      const [settingsRes, servicesRes, barbersRes, galleryRes, reviewsRes, hoursRes] = await Promise.all([
+      const [settingsRes, servicesRes, barbersRes, reviewsRes, hoursRes] = await Promise.all([
         supabase.from('shop_settings').select('*').single(),
         supabase.from('services').select('*').eq('is_active', true).order('sort_order'),
         supabase.from('barbers').select('*').eq('is_active', true).order('sort_order'),
-        supabase.from('gallery').select('*').order('sort_order'),
         supabase.from('reviews').select('*, profiles(full_name), barbers(display_name)').eq('is_visible', true),
         supabase.from('shop_hours').select('*').order('weekday')
       ])
@@ -30,7 +28,6 @@ export default function Home() {
       if (settingsRes.data) setShopSettings(settingsRes.data)
       if (servicesRes.data) setServices(servicesRes.data)
       if (barbersRes.data) setBarbers(barbersRes.data)
-      if (galleryRes.data) setGallery(galleryRes.data)
       if (reviewsRes.data) setReviews(reviewsRes.data)
       if (hoursRes.data) setShopHours(hoursRes.data)
     } catch (error) {
@@ -69,7 +66,7 @@ export default function Home() {
             <Scissors className="h-16 w-16 text-gold-500" />
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-            {shopSettings?.shop_name || 'Ziko Barbershop'}
+            {shopSettings?.shop_name || 'ZIKO TEST VERSION'}
           </h1>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
             {shopSettings?.description || 'Premium barbershop experience with skilled professionals'}
@@ -127,26 +124,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Gallery Section */}
-      {gallery.length > 0 && (
-        <section className="py-16 bg-dark-900">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-center mb-12 text-white">Gallery</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {gallery.map((item) => (
-                <div key={item.id} className="aspect-square overflow-hidden rounded-lg">
-                  <img 
-                    src={item.image_url} 
-                    alt={item.caption || 'Gallery'} 
-                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Reviews Section */}
       {reviews.length > 0 && (

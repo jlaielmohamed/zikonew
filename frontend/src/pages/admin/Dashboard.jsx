@@ -1,9 +1,9 @@
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
-import { 
-  BarChart3, Calendar, Scissors, Users, Clock, Settings, 
-  Image, Star, FileText, Plus, Bell 
+import {
+  BarChart3, Calendar, Scissors, Users, Clock, Settings,
+  Star, FileText, Plus, Bell
 } from 'lucide-react'
 import Overview from './Overview'
 import Appointments from './Appointments'
@@ -12,7 +12,6 @@ import Barbers from './Barbers'
 import WorkingTime from './WorkingTime'
 import Customers from './Customers'
 import ShopSettings from './ShopSettings'
-import Gallery from './Gallery'
 import Reviews from './Reviews'
 import Reports from './Reports'
 
@@ -24,7 +23,6 @@ const menuItems = [
   { path: '/admin/working-time', label: 'Working Time', icon: Clock },
   { path: '/admin/customers', label: 'Customers', icon: Users },
   { path: '/admin/settings', label: 'Shop Settings', icon: Settings },
-  { path: '/admin/gallery', label: 'Gallery', icon: Image },
   { path: '/admin/reviews', label: 'Reviews', icon: Star },
   { path: '/admin/reports', label: 'Reports', icon: FileText },
 ]
@@ -35,11 +33,11 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchPendingCount()
-    
+
     // Subscribe to realtime bookings
     const subscription = supabase
       .channel('admin-bookings')
-      .on('postgres_changes', 
+      .on('postgres_changes',
         { event: '*', schema: 'public', table: 'bookings' },
         () => {
           fetchPendingCount()
@@ -104,7 +102,6 @@ export default function AdminDashboard() {
             <Route path="working-time" element={<WorkingTime />} />
             <Route path="customers" element={<Customers />} />
             <Route path="settings" element={<ShopSettings />} />
-            <Route path="gallery" element={<Gallery />} />
             <Route path="reviews" element={<Reviews />} />
             <Route path="reports" element={<Reports />} />
           </Routes>
