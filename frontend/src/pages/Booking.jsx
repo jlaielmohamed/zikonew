@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 import { format, addDays } from 'date-fns'
 import { useLanguage } from '../i18n/LanguageContext'
+import { TURNSTILE_SITE_KEY } from '../config/turnstile'
+
+const TURNSTILE_SCRIPT_ID = 'cf-turnstile-script'
 
 export default function Booking() {
   const { user, profile } = useAuth()
@@ -23,6 +26,24 @@ export default function Booking() {
   const [loading, setLoading] = useState(false)
   const [shopSettings, setShopSettings] = useState(null)
   const [bookingDone, setBookingDone] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState('')
+  const turnstileTokenRef = useRef('')
+  const turnstileWidgetIdRef = useRef(null)
+  const turnstileContainerRef = useRef(null)
+
+  const resetTurnstile = useCallback(() => {
+    turnstileTokenRef.current = ''
+    setTurnstileToken('')
+
+    const widgetId = turnstileWidgetIdRef.current
+    if (widgetId !== null && window.turnstile) {
+      try {
+        window.turnstile.reset(widgetId)
+      } catch (error) {
+        console.error('Error resetting Turnstile:', error)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     fetchData()
@@ -31,6 +52,59 @@ export default function Booking() {
   useEffect(() => {
     if (user?.email) setCustomerEmail(user.email)
   }, [user])
+
+  // Turnstile is only needed on the final confirm step. Load the script once,
+  // then render an explicit widget when that step is shown.
+  useEffect(() => {
+    if (step !== 5 || bookingDone) return undefined
+
+    let cancelled = false
+    let script = document.getElementById(TURNSTILE_SCRIPT_ID)
+
+    const renderWidget = () => {
+      if (
+        cancelled ||
+        !window.turnstile ||
+        !turnstileContainerRef.current ||
+        turnstileWidgetIdRef.current !== null
+      ) {
+        return
+      }
+
+      turnstileWidgetIdRef.current = window.turnstile.render(turnstileContainerRef.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        theme: 'dark',
+        callback: (token) => {
+          turnstileTokenRef.current = token
+          setTurnstileToken(token)
+        },
+        'expired-callback': resetTurnstile,
+        'error-callback': resetTurnstile,
+      })
+    }
+
+    if (window.turnstile) {
+      renderWidget()
+    } else if (script) {
+      script.addEventListener('load', renderWidget)
+    } else {
+      script = document.createElement('script')
+      script.id = TURNSTILE_SCRIPT_ID
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+      script.async = true
+      script.defer = true
+      script.addEventListener('load', renderWidget)
+      document.head.appendChild(script)
+    }
+
+    return () => {
+      cancelled = true
+      if (script) script.removeEventListener('load', renderWidget)
+      turnstileWidgetIdRef.current = null
+      turnstileTokenRef.current = ''
+      setTurnstileToken('')
+    }
+  }, [step, bookingDone, resetTurnstile])
 
   useEffect(() => {
     if (selectedService && selectedDate) {
@@ -69,6 +143,33 @@ export default function Booking() {
     
     setLoading(true)
     try {
+      const token = turnstileTokenRef.current
+      if (!token) {
+        toast.error(t('booking.captchaRequired'))
+        resetTurnstile()
+        return
+      }
+
+      let verification
+      try {
+        const { data, error } = await supabase.functions.invoke('verify-turnstile', {
+          body: { token }
+        })
+        if (error) throw error
+        verification = data
+      } catch (error) {
+        console.error('Turnstile verification failed:', error)
+        resetTurnstile()
+        toast.error(t('booking.captchaFailed'))
+        return
+      }
+
+      if (!verification?.success) {
+        resetTurnstile()
+        toast.error(t('booking.captchaFailed'))
+        return
+      }
+
       const { data, error } = await supabase.rpc('create_booking', {
         p_barber_id: selectedSlot.barber_id,
         p_service_id: selectedService.id,
@@ -84,6 +185,7 @@ export default function Booking() {
       toast.success(t('booking.success'))
       setBookingDone(true)
     } catch (error) {
+      resetTurnstile()
       toast.error(error.message)
     } finally {
       setLoading(false)
@@ -95,7 +197,11 @@ export default function Booking() {
     if (step === 2) return true // barber optional (any available)
     if (step === 3) return selectedDate
     if (step === 4) return selectedSlot
-    if (step === 5) return customerEmail && (user || (guestName && guestPhone))
+    if (step === 5) {
+      return Boolean(customerEmail.trim()) &&
+        (user || (guestName.trim() && guestPhone.trim())) &&
+        Boolean(turnstileToken)
+    }
     return false
   }
 
@@ -115,6 +221,9 @@ export default function Booking() {
     setGuestPhone('')
     setNotes('')
     setCustomerEmail(user?.email || '')
+    turnstileTokenRef.current = ''
+    turnstileWidgetIdRef.current = null
+    setTurnstileToken('')
   }
 
   // Guests do not have an account, so show a confirmation instead of the
@@ -347,6 +456,13 @@ export default function Booking() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                   />
+                </div>
+
+                <div>
+                  <div ref={turnstileContainerRef} className="min-h-[65px]" />
+                  {!turnstileToken && (
+                    <p className="text-gray-500 text-xs mt-1">{t('booking.captchaHint')}</p>
+                  )}
                 </div>
               </div>
             </div>

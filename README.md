@@ -45,17 +45,19 @@ A complete barbershop booking platform built with React, Tailwind CSS, and Supab
 1. Install Supabase CLI: `npm install -g supabase`
 2. Login: `supabase login`
 3. Link your project: `supabase link --project-ref YOUR_PROJECT_REF`
-4. Deploy both functions (JWT verification is disabled in `supabase/config.toml`):
+4. Deploy the functions (JWT verification is disabled in `supabase/config.toml`):
    ```bash
    supabase functions deploy create-barber-account --no-verify-jwt
    supabase functions deploy send-booking-email --no-verify-jwt
+   supabase functions deploy verify-turnstile --no-verify-jwt
    ```
-5. Set the email secrets:
+5. Set the email and Turnstile secrets:
    ```bash
    supabase secrets set RESEND_API_KEY=re_...
    supabase secrets set EMAIL_FROM="Ziko Barbershop <booking@yourdomain.com>"
+   supabase secrets set TURNSTILE_SECRET_KEY=your_turnstile_secret_key
    ```
-   The `EMAIL_FROM` domain must be verified in Resend. Dates in the emails use `Africa/Tunis` and the emails are written in French.
+   The `EMAIL_FROM` domain must be verified in Resend. Dates in the emails use `Africa/Tunis` and the emails are written in French. Never put `TURNSTILE_SECRET_KEY` in the frontend or in `.env`.
 6. The barber emails are already set in `supabase/functions/send-booking-email/index.ts` (Ziko → mohamedjlaiel.pro@gmail.com, Yassine → mohamedjlaiel5000@gmail.com). Routing uses the barber's name; add UUID keys to `BARBER_EMAILS` if you prefer strict ID-based routing.
 
 ### Booking email flow
@@ -81,6 +83,14 @@ curl -X POST https://YOUR_PROJECT_REF.supabase.co/functions/v1/send-booking-emai
   -H "Content-Type: application/json" \
   -d '{"type":"INSERT","record":{"barber_id":"BARBER_UUID","customer_email":"customer@example.com","guest_name":"John","guest_phone":"0612345678","service_name":"Classic Haircut","starts_at":"2026-11-25T10:00:00Z","price_at_booking":25,"status":"pending"}}'
 ```
+
+### Turnstile booking check
+
+- The public site key is `frontend/src/config/turnstile.js`; it is safe to ship with the frontend.
+- Your production/localhost domains are already allowed in Cloudflare Turnstile.
+- The secret key is stored only as the Supabase secret `TURNSTILE_SECRET_KEY` (see step 4).
+- The visible checkbox appears only on the final booking step. The customer must tick it before **Confirm Booking** is enabled.
+- On submit, the frontend calls `verify-turnstile`. Only when Cloudflare confirms the token does the app call `create_booking`. A failed or expired check clears the checkbox so the customer can tick it again.
 
 ### 5. Configure Authentication
 
@@ -162,6 +172,7 @@ npm run build
 ## Important Notes
 
 - **No customer accounts** - Customers book as guests with their email; only Ziko and barbers have logins
+- **Turnstile on the final booking step** - public site key in the frontend, secret key in Supabase, verified before `create_booking`
 - **No service role key in frontend** - Only used in Edge Function
 - **Email confirmation disabled** for instant sign-in as requested
 - **Email notifications via Resend**: the barber is emailed on a new booking, and the customer is emailed when the booking is accepted or declined
