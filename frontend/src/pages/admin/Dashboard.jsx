@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import {
   BarChart3, Calendar, Scissors, Users, Clock, Settings,
-  FileText, Menu, X, Bell
+  FileText, Menu, X, Bell, User
 } from 'lucide-react'
 import Overview from './Overview'
 import Appointments from './Appointments'
@@ -12,6 +12,7 @@ import Barbers from './Barbers'
 import WorkingTime from './WorkingTime'
 import ShopSettings from './ShopSettings'
 import Reports from './Reports'
+import Account from './Account'
 import { useLanguage } from '../../i18n/LanguageContext'
 
 const menuItems = [
@@ -22,6 +23,7 @@ const menuItems = [
   { path: '/admin/working-time', labelKey: 'a.menu.workingTime', icon: Clock },
   { path: '/admin/settings', labelKey: 'a.menu.settings', icon: Settings },
   { path: '/admin/reports', labelKey: 'a.menu.reports', icon: FileText },
+  { path: '/admin/account', labelKey: 'a.menu.account', icon: User },
 ]
 
 export default function AdminDashboard() {
@@ -164,6 +166,7 @@ export default function AdminDashboard() {
             <Route path="working-time" element={<WorkingTime />} />
             <Route path="settings" element={<ShopSettings />} />
             <Route path="reports" element={<Reports />} />
+            <Route path="account" element={<Account />} />
           </Routes>
         </main>
       </div>

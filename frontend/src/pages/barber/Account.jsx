@@ -126,7 +126,7 @@ export default function BarberAccount() {
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">{t('auth.password')}</label>
+              <label className="block text-xs text-gray-400 mb-1">{t('b.ac.confirmPassword')}</label>
               <input
                 type="password"
                 className="input w-full"

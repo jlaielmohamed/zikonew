@@ -4,12 +4,23 @@ import toast from 'react-hot-toast'
 import { Plus, Edit } from 'lucide-react'
 import { useLanguage } from '../../i18n/LanguageContext'
 
+const emptyForm = {
+  name: '',
+  description: '',
+  duration_minutes: 30,
+  price: 0,
+  category: '',
+  is_active: true,
+}
+
 export default function Services() {
   const { t, formatPrice } = useLanguage()
   const [services, setServices] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
-  const [formData, setFormData] = useState({ name: '', description: '', duration_minutes: 30, price: 0, category: '', is_active: true })
+  const [editing, setEditing] = useState(null)
+  const [formData, setFormData] = useState(emptyForm)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     fetchServices()
@@ -21,17 +32,57 @@ export default function Services() {
     setLoading(false)
   }
 
+  const openAdd = () => {
+    setEditing(null)
+    setFormData(emptyForm)
+    setShowModal(true)
+  }
+
+  const openEdit = (service) => {
+    setEditing(service)
+    setFormData({
+      name: service.name || '',
+      description: service.description || '',
+      duration_minutes: service.duration_minutes,
+      price: service.price,
+      category: service.category || '',
+      is_active: service.is_active,
+    })
+    setShowModal(true)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setSaving(true)
+
     try {
-      const { error } = await supabase.from('services').insert([formData])
+      const payload = {
+        ...formData,
+        name: formData.name.trim(),
+        description: formData.description.trim() || null,
+        category: formData.category.trim() || null,
+        duration_minutes: Number(formData.duration_minutes),
+        price: Number(formData.price),
+      }
+
+      let error
+      if (editing) {
+        ({ error } = await supabase
+          .from('services')
+          .update(payload)
+          .eq('id', editing.id))
+      } else {
+        ({ error } = await supabase.from('services').insert([payload]))
+      }
+
       if (error) throw error
-      toast.success(t('a.sv.added'))
+      toast.success(editing ? t('a.sv.updated') : t('a.sv.added'))
       setShowModal(false)
       fetchServices()
-      setFormData({ name: '', description: '', duration_minutes: 30, price: 0, category: '', is_active: true })
     } catch (error) {
       toast.error(error.message)
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -49,7 +100,7 @@ export default function Services() {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('a.menu.services')}</h1>
-        <button onClick={() => setShowModal(true)} className="btn-primary flex items-center whitespace-nowrap">
+        <button onClick={openAdd} className="btn-primary flex items-center whitespace-nowrap">
           <Plus className="h-4 w-4 mr-2" /> {t('a.sv.add')}
         </button>
       </div>
@@ -77,7 +128,13 @@ export default function Services() {
                   </button>
                 </td>
                 <td className="py-3">
-                  <button className="p-1 text-blue-500 hover:bg-blue-500/10 rounded" aria-label={t('a.edit')}><Edit className="h-4 w-4" /></button>
+                  <button
+                    onClick={() => openEdit(service)}
+                    className="p-1 text-blue-500 hover:bg-blue-500/10 rounded"
+                    aria-label={t('a.edit')}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
                 </td>
               </tr>
             ))}
@@ -100,7 +157,13 @@ export default function Services() {
               <button onClick={() => toggleActive(service.id, service.is_active)} className={`px-2 py-1 rounded text-xs ${service.is_active ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-500'}`}>
                 {service.is_active ? t('a.active') : t('a.inactive')}
               </button>
-              <button className="ml-auto p-1 text-blue-500 hover:bg-blue-500/10 rounded" aria-label={t('a.edit')}><Edit className="h-4 w-4" /></button>
+              <button
+                onClick={() => openEdit(service)}
+                className="ml-auto p-1 text-blue-500 hover:bg-blue-500/10 rounded"
+                aria-label={t('a.edit')}
+              >
+                <Edit className="h-4 w-4" />
+              </button>
             </div>
           </div>
         ))}
@@ -109,17 +172,21 @@ export default function Services() {
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="card w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold text-white mb-4">{t('a.sv.add')}</h2>
+            <h2 className="text-xl font-bold text-white mb-4">
+              {editing ? t('a.sv.edit') : t('a.sv.add')}
+            </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <input type="text" placeholder={t('a.name')} required className="input w-full" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
               <textarea placeholder={t('a.sv.description')} className="input w-full" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <input type="number" placeholder={t('a.sv.durationMin')} required className="input w-full" value={formData.duration_minutes} onChange={(e) => setFormData({...formData, duration_minutes: parseInt(e.target.value)})} />
-                <input type="number" step="0.01" placeholder={t('a.price')} required className="input w-full" value={formData.price} onChange={(e) => setFormData({...formData, price: parseFloat(e.target.value)})} />
+                <input type="number" placeholder={t('a.sv.durationMin')} required min="1" className="input w-full" value={formData.duration_minutes} onChange={(e) => setFormData({...formData, duration_minutes: parseInt(e.target.value)})} />
+                <input type="number" step="0.01" placeholder={t('a.price')} required min="0" className="input w-full" value={formData.price} onChange={(e) => setFormData({...formData, price: parseFloat(e.target.value)})} />
               </div>
               <input type="text" placeholder={t('a.sv.category')} className="input w-full" value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} />
               <div className="flex gap-2 pt-2">
-                <button type="submit" className="btn-primary flex-1">{t('a.save')}</button>
+                <button type="submit" disabled={saving} className="btn-primary flex-1 disabled:opacity-50">
+                  {saving ? t('b.wt.saving') : t('a.save')}
+                </button>
                 <button type="button" onClick={() => setShowModal(false)} className="btn-secondary flex-1">{t('a.cancel')}</button>
               </div>
             </form>

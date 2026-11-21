@@ -174,6 +174,7 @@ export const translations = {
     'b.ac.email': 'Login email',
     'b.ac.newEmail': 'New email (leave blank to keep)',
     'b.ac.password': 'New password (leave blank to keep)',
+    'b.ac.confirmPassword': 'Confirm new password',
     'b.ac.fullName': 'Full name',
     'b.ac.phone': 'Phone',
     'b.ac.saved': 'Account updated',
@@ -216,6 +217,9 @@ export const translations = {
     'a.menu.workingTime': 'Working Time',
     'a.menu.settings': 'Shop Settings',
     'a.menu.reports': 'Reports',
+    'a.menu.account': 'My account',
+    'a.ac.title': 'My account',
+    'a.ac.help': 'Change your login email and password, or update your contact details.',
 
     // Admin: overview
     'a.ov.revenue30': 'Revenue (30 days)',
@@ -244,6 +248,8 @@ export const translations = {
     // Admin: services, barbers, settings, reports
     'a.sv.add': 'Add Service',
     'a.sv.added': 'Service added',
+    'a.sv.updated': 'Service updated',
+    'a.sv.edit': 'Edit service',
     'a.sv.duration': 'Duration',
     'a.sv.durationMin': 'Duration (minutes)',
     'a.sv.description': 'Description',
@@ -479,6 +485,7 @@ export const translations = {
     'b.ac.email': 'E-mail de connexion',
     'b.ac.newEmail': 'Nouvel e-mail (laisser vide pour garder)',
     'b.ac.password': 'Nouveau mot de passe (laisser vide pour garder)',
+    'b.ac.confirmPassword': 'Confirmer le nouveau mot de passe',
     'b.ac.fullName': 'Nom complet',
     'b.ac.phone': 'Téléphone',
     'b.ac.saved': 'Compte mis à jour',
@@ -521,6 +528,9 @@ export const translations = {
     'a.menu.workingTime': 'Horaires de travail',
     'a.menu.settings': 'Paramètres du salon',
     'a.menu.reports': 'Rapports',
+    'a.menu.account': 'Mon compte',
+    'a.ac.title': 'Mon compte',
+    'a.ac.help': 'Modifiez votre e-mail et votre mot de passe de connexion ou vos coordonnées.',
 
     // Admin: overview
     'a.ov.revenue30': 'Chiffre d’affaires (30 jours)',
@@ -549,6 +559,8 @@ export const translations = {
     // Admin: services, barbers, settings, reports
     'a.sv.add': 'Ajouter un service',
     'a.sv.added': 'Service ajouté',
+    'a.sv.updated': 'Service mis à jour',
+    'a.sv.edit': 'Modifier le service',
     'a.sv.duration': 'Durée',
     'a.sv.durationMin': 'Durée (minutes)',
     'a.sv.description': 'Description',

@@ -7,7 +7,7 @@ A complete barbershop booking platform built with React, Tailwind CSS, and Supab
 - **Public Website**: Homepage with services, barbers, gallery, reviews, hours, and booking
 - **Booking System**: Service → Barber → Date → Time slot selection with guest/customer support
 - **Customer Portal**: View and cancel bookings with real-time status updates
-- **Admin Dashboard**: Complete shop management with analytics, appointments, services, barbers, etc.
+- **Admin Dashboard**: Complete shop management with analytics, appointments, add/edit services, barbers, etc.; Ziko can change his own email/password from **My account**
 - **Barber Dashboard**: Accept/decline bookings, manage own prices, offered services, working hours, time off, and login credentials
 - **Barber Accounts**: Ziko creates each barber login from Admin → Barbers; barbers sign in on the single staff login page and can change their email/password afterwards
 - **Real-time Updates**: Live booking notifications and status changes
