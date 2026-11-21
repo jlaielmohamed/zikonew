@@ -11,6 +11,10 @@ const MAPS_LAT = 34.7909844
 const MAPS_LNG = 10.7804827
 const MAPS_EMBED_URL = `https://maps.google.com/maps?q=${MAPS_LAT},${MAPS_LNG}&z=17&output=embed`
 
+// Social profile links used by the footer icons.
+const FACEBOOK_URL = '#'
+const INSTAGRAM_URL = '#'
+
 export default function Home() {
   const { isBarber } = useAuth()
   const { t, formatPrice } = useLanguage()
@@ -259,6 +263,43 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* Footer */}
+      <footer className="bg-dark-800 border-t border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="flex items-center space-x-2">
+              <img src="/logo.jpg" alt={t('home.logoAlt')} className="h-10 w-10 rounded-full object-cover" />
+              <span className="text-lg font-bold text-white">ZIKO</span>
+            </div>
+
+            <p className="text-sm text-gray-400 text-center">
+              © {new Date().getFullYear()} {shopSettings?.shop_name || 'Ziko Barbershop'}. {t('home.rights')}
+            </p>
+
+            <div className="flex items-center gap-3">
+              <a
+                href={FACEBOOK_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="p-2 rounded-full bg-dark-700 text-gold-500 hover:bg-gold-500 hover:text-black transition-colors"
+              >
+                <Facebook className="h-5 w-5" />
+              </a>
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="p-2 rounded-full bg-dark-700 text-gold-500 hover:bg-gold-500 hover:text-black transition-colors"
+              >
+                <Instagram className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
