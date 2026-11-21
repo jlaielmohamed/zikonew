@@ -3,16 +3,14 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import {
   BarChart3, Calendar, Scissors, Users, Clock, Settings,
-  Star, FileText, Plus, Bell
+  FileText, Plus, Bell
 } from 'lucide-react'
 import Overview from './Overview'
 import Appointments from './Appointments'
 import Services from './Services'
 import Barbers from './Barbers'
 import WorkingTime from './WorkingTime'
-import Customers from './Customers'
 import ShopSettings from './ShopSettings'
-import Reviews from './Reviews'
 import Reports from './Reports'
 import { useLanguage } from '../../i18n/LanguageContext'
 
@@ -22,9 +20,7 @@ const menuItems = [
   { path: '/admin/services', labelKey: 'a.menu.services', icon: Scissors },
   { path: '/admin/barbers', labelKey: 'a.menu.barbers', icon: Users },
   { path: '/admin/working-time', labelKey: 'a.menu.workingTime', icon: Clock },
-  { path: '/admin/customers', labelKey: 'a.menu.customers', icon: Users },
   { path: '/admin/settings', labelKey: 'a.menu.settings', icon: Settings },
-  { path: '/admin/reviews', labelKey: 'a.menu.reviews', icon: Star },
   { path: '/admin/reports', labelKey: 'a.menu.reports', icon: FileText },
 ]
 
@@ -102,9 +98,7 @@ export default function AdminDashboard() {
             <Route path="services" element={<Services />} />
             <Route path="barbers" element={<Barbers />} />
             <Route path="working-time" element={<WorkingTime />} />
-            <Route path="customers" element={<Customers />} />
             <Route path="settings" element={<ShopSettings />} />
-            <Route path="reviews" element={<Reviews />} />
             <Route path="reports" element={<Reports />} />
           </Routes>
         </div>

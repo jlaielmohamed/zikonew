@@ -209,9 +209,7 @@ export const translations = {
     'a.menu.services': 'Services',
     'a.menu.barbers': 'Barbers',
     'a.menu.workingTime': 'Working Time',
-    'a.menu.customers': 'Customers',
     'a.menu.settings': 'Shop Settings',
-    'a.menu.reviews': 'Reviews',
     'a.menu.reports': 'Reports',
 
     // Admin: overview
@@ -238,7 +236,7 @@ export const translations = {
     'a.ap.denied': 'Booking denied successfully',
     'a.ap.statusUpdated': 'Status updated',
 
-    // Admin: services, barbers, customers, settings, reviews, reports
+    // Admin: services, barbers, settings, reports
     'a.sv.add': 'Add Service',
     'a.sv.added': 'Service added',
     'a.sv.duration': 'Duration',
@@ -247,7 +245,6 @@ export const translations = {
     'a.sv.category': 'Category',
     'a.br.add': 'Add Barber',
     'a.br.bio': 'Bio',
-    'a.cu.blocked': 'Blocked',
     'a.st.shopName': 'Shop Name',
     'a.st.address': 'Address',
     'a.st.city': 'City',
@@ -256,8 +253,6 @@ export const translations = {
     'a.st.openForBooking': 'Open for Booking',
     'a.st.save': 'Save Settings',
     'a.st.saved': 'Settings saved',
-    'a.rv.visible': 'Visible',
-    'a.rv.hidden': 'Hidden',
     'a.rp.revenue': 'Revenue',
     'a.rp.last30': 'Last 30 days',
 
@@ -514,9 +509,7 @@ export const translations = {
     'a.menu.services': 'Services',
     'a.menu.barbers': 'Coiffeurs',
     'a.menu.workingTime': 'Horaires de travail',
-    'a.menu.customers': 'Clients',
     'a.menu.settings': 'Paramètres du salon',
-    'a.menu.reviews': 'Avis',
     'a.menu.reports': 'Rapports',
 
     // Admin: overview
@@ -543,7 +536,7 @@ export const translations = {
     'a.ap.denied': 'Réservation refusée avec succès',
     'a.ap.statusUpdated': 'Statut mis à jour',
 
-    // Admin: services, barbers, customers, settings, reviews, reports
+    // Admin: services, barbers, settings, reports
     'a.sv.add': 'Ajouter un service',
     'a.sv.added': 'Service ajouté',
     'a.sv.duration': 'Durée',
@@ -552,7 +545,6 @@ export const translations = {
     'a.sv.category': 'Catégorie',
     'a.br.add': 'Ajouter un coiffeur',
     'a.br.bio': 'Bio',
-    'a.cu.blocked': 'Bloqué',
     'a.st.shopName': 'Nom du salon',
     'a.st.address': 'Adresse',
     'a.st.city': 'Ville',
@@ -561,8 +553,6 @@ export const translations = {
     'a.st.openForBooking': 'Ouvert aux réservations',
     'a.st.save': 'Enregistrer les paramètres',
     'a.st.saved': 'Paramètres enregistrés',
-    'a.rv.visible': 'Visible',
-    'a.rv.hidden': 'Masqué',
     'a.rp.revenue': 'Chiffre d’affaires',
     'a.rp.last30': '30 derniers jours',
 
