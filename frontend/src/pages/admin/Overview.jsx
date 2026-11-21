@@ -46,76 +46,79 @@ export default function Overview() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-white mb-6">{t('a.menu.overview')}</h1>
-      
+      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6">{t('a.menu.overview')}</h1>
+
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
         <div className="card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-400 text-sm">{t('a.ov.revenue30')}</p>
-              <p className="text-2xl font-bold text-gold-500">{formatPrice(stats?.revenue || 0)}</p>
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-gray-400 text-xs sm:text-sm">{t('a.ov.revenue30')}</p>
+              <p className="text-xl sm:text-2xl font-bold text-gold-500 break-words">{formatPrice(stats?.revenue || 0)}</p>
             </div>
-            <DollarSign className="h-8 w-8 text-gold-500" />
+            <DollarSign className="h-7 w-7 sm:h-8 sm:w-8 text-gold-500 flex-shrink-0" />
           </div>
         </div>
-        
+
         <div className="card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-400 text-sm">{t('a.ov.today')}</p>
-              <p className="text-2xl font-bold text-white">{todayBookings.length}</p>
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-gray-400 text-xs sm:text-sm">{t('a.ov.today')}</p>
+              <p className="text-xl sm:text-2xl font-bold text-white">{todayBookings.length}</p>
             </div>
-            <Calendar className="h-8 w-8 text-gold-500" />
+            <Calendar className="h-7 w-7 sm:h-8 sm:w-8 text-gold-500 flex-shrink-0" />
           </div>
         </div>
-        
+
         <div className="card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-400 text-sm">{t('status.pending')}</p>
-              <p className="text-2xl font-bold text-yellow-500">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-gray-400 text-xs sm:text-sm">{t('status.pending')}</p>
+              <p className="text-xl sm:text-2xl font-bold text-yellow-500">
                 {stats?.bookings_by_status?.pending || 0}
               </p>
             </div>
-            <Clock className="h-8 w-8 text-yellow-500" />
+            <Clock className="h-7 w-7 sm:h-8 sm:w-8 text-yellow-500 flex-shrink-0" />
           </div>
         </div>
-        
+
         <div className="card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-400 text-sm">{t('status.completed')}</p>
-              <p className="text-2xl font-bold text-green-500">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-gray-400 text-xs sm:text-sm">{t('status.completed')}</p>
+              <p className="text-xl sm:text-2xl font-bold text-green-500">
                 {stats?.bookings_by_status?.completed || 0}
               </p>
             </div>
-            <Users className="h-8 w-8 text-green-500" />
+            <Users className="h-7 w-7 sm:h-8 sm:w-8 text-green-500 flex-shrink-0" />
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Today's Appointments */}
-        <div className="card">
-          <h2 className="text-xl font-semibold text-white mb-4">{t('a.ov.today')}</h2>
+        <div className="card min-w-0">
+          <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">{t('a.ov.today')}</h2>
           {todayBookings.length === 0 ? (
             <p className="text-gray-400">{t('a.ov.noToday')}</p>
           ) : (
             <div className="space-y-3">
               {todayBookings.map((booking) => (
-                <div key={booking.id} className="flex justify-between items-center p-3 bg-dark-700 rounded">
-                  <div>
-                    <p className="text-white font-semibold">
+                <div
+                  key={booking.id}
+                  className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 bg-dark-700 rounded"
+                >
+                  <div className="min-w-0">
+                    <p className="text-white font-semibold break-words">
                       {booking.profiles?.full_name || booking.guest_name}
                     </p>
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-gray-400 text-sm break-words">
                       {booking.services?.name} {t('a.with')} {booking.barbers?.display_name}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="flex items-center gap-3 sm:flex-col sm:items-end sm:gap-1 sm:text-right flex-shrink-0">
                     <p className="text-gold-500">{format(new Date(booking.starts_at), 'HH:mm')}</p>
-                    <span className={`text-xs px-2 py-1 rounded ${
+                    <span className={`text-xs px-2 py-1 rounded whitespace-nowrap ${
                       booking.status === 'accepted' ? 'bg-green-500/10 text-green-500' :
                       booking.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500' :
                       'bg-gray-500/10 text-gray-500'
@@ -130,18 +133,18 @@ export default function Overview() {
         </div>
 
         {/* Top Services */}
-        <div className="card">
-          <h2 className="text-xl font-semibold text-white mb-4">{t('a.ov.topServices')}</h2>
+        <div className="card min-w-0">
+          <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">{t('a.ov.topServices')}</h2>
           {stats?.top_services?.length > 0 ? (
             <div className="space-y-3">
               {stats.top_services.map((service, idx) => (
-                <div key={idx} className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <Scissors className="h-4 w-4 text-gold-500 mr-2" />
-                    <span className="text-white">{service.name}</span>
+                <div key={idx} className="flex items-center justify-between gap-3">
+                  <div className="flex items-center min-w-0">
+                    <Scissors className="h-4 w-4 text-gold-500 mr-2 flex-shrink-0" />
+                    <span className="text-white break-words">{service.name}</span>
                   </div>
-                  <div className="text-right">
-                    <p className="text-white">{service.count} {t('a.bookings')}</p>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-white text-sm sm:text-base">{service.count} {t('a.bookings')}</p>
                     <p className="text-gold-500 text-sm">{formatPrice(service.revenue)}</p>
                   </div>
                 </div>

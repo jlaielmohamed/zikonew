@@ -129,15 +129,15 @@ export default function Barbers() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-white">{t('a.menu.barbers')}</h1>
-        <button onClick={openAdd} className="btn-primary flex items-center">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('a.menu.barbers')}</h1>
+        <button onClick={openAdd} className="btn-primary flex items-center whitespace-nowrap">
           <Plus className="h-4 w-4 mr-2" /> {t('a.br.add')}
         </button>
       </div>
 
-      <div className="card">
-        <table className="w-full">
+      <div className="card hidden sm:block overflow-x-auto">
+        <table className="w-full min-w-[640px]">
           <thead>
             <tr className="border-b border-gray-700">
               <th className="text-left text-gray-400 pb-3">{t('a.name')}</th>
@@ -175,10 +175,41 @@ export default function Barbers() {
         </table>
       </div>
 
+      {/* Cards for phones */}
+      <div className="sm:hidden space-y-3">
+        {barbers.map((barber) => (
+          <div key={barber.id} className="card">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-white font-semibold break-words">{barber.display_name}</p>
+                {barber.profile_id && (
+                  <span className="text-xs text-green-500">{t('a.br.linked')}</span>
+                )}
+                {barber.bio && <p className="text-gray-400 text-sm mt-1 break-words">{barber.bio}</p>}
+              </div>
+              <button
+                onClick={() => toggleActive(barber.id, barber.is_active)}
+                className={`px-2 py-1 rounded text-xs flex-shrink-0 ${barber.is_active ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-500'}`}
+              >
+                {barber.is_active ? t('a.active') : t('a.inactive')}
+              </button>
+            </div>
+            <div className="mt-3 pt-3 border-t border-gray-700">
+              <button
+                onClick={() => openEdit(barber)}
+                className="text-xs bg-blue-500 text-white px-2 py-1 rounded flex items-center"
+              >
+                <Edit className="h-3 w-3 mr-1" /> {t('a.edit')}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="card w-full max-w-lg max-h-screen overflow-y-auto">
-            <h2 className="text-xl font-bold text-white mb-4">
+          <div className="card w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg sm:text-xl font-bold text-white mb-4">
               {editing ? t('a.edit') : t('a.br.add')}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">

@@ -153,8 +153,8 @@ export default function WorkingTime() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-white mb-6 flex items-center">
-        <Clock className="h-8 w-8 text-gold-500 mr-3" />
+      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 flex items-center">
+        <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-gold-500 mr-3 flex-shrink-0" />
         {t('a.wt.title')}
       </h1>
 
@@ -162,15 +162,15 @@ export default function WorkingTime() {
       <div className="card">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div>
-            <h2 className="text-xl font-semibold text-white flex items-center">
-              <CheckCircle className="h-5 w-5 text-gold-500 mr-2" />
+            <h2 className="text-lg sm:text-xl font-semibold text-white flex items-center">
+              <CheckCircle className="h-5 w-5 text-gold-500 mr-2 flex-shrink-0" />
               {t('a.wt.weekly')}
             </h2>
             <p className="text-sm text-gray-400 mt-1">
               {t('a.wt.weeklyHelp')}
             </p>
           </div>
-          <button onClick={saveWeek} disabled={!hasChanges || savingWeek} className="btn-primary disabled:opacity-50">
+          <button onClick={saveWeek} disabled={!hasChanges || savingWeek} className="btn-primary disabled:opacity-50 w-full sm:w-auto">
             {savingWeek ? t('a.wt.saving') : t('a.wt.saveChanges')}
           </button>
         </div>
@@ -179,12 +179,12 @@ export default function WorkingTime() {
           {draft.map((h) => (
             <div
               key={h.weekday}
-              className={`flex flex-wrap justify-between items-center p-4 bg-dark-700 rounded-lg gap-4 ${
+              className={`flex flex-wrap justify-between items-center p-3 sm:p-4 bg-dark-700 rounded-lg gap-3 sm:gap-4 ${
                 isChanged(h) ? 'ring-1 ring-gold-500' : ''
               }`}
             >
-              <div className="flex items-center space-x-4">
-                <span className="text-white font-medium w-24">{t(`day.${h.weekday}`)}</span>
+              <div className="flex items-center gap-3 sm:gap-4">
+                <span className="text-white font-medium w-20 sm:w-24">{t(`day.${h.weekday}`)}</span>
                 <button
                   type="button"
                   onClick={() => toggleOpen(h.weekday)}
@@ -197,17 +197,17 @@ export default function WorkingTime() {
               </div>
 
               {h.is_open && (
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <input
                     type="time"
-                    className="input bg-dark-800 text-white text-sm p-1"
+                    className="input bg-dark-800 text-white text-sm p-1 min-w-0"
                     value={h.open_time}
                     onChange={(e) => updateDraft(h.weekday, { open_time: e.target.value })}
                   />
                   <span className="text-gray-400">{t('a.wt.to')}</span>
                   <input
                     type="time"
-                    className="input bg-dark-800 text-white text-sm p-1"
+                    className="input bg-dark-800 text-white text-sm p-1 min-w-0"
                     value={h.close_time}
                     onChange={(e) => updateDraft(h.weekday, { close_time: e.target.value })}
                   />
@@ -220,8 +220,8 @@ export default function WorkingTime() {
 
       {/* Closed days & special hours */}
       <div className="card">
-        <h2 className="text-xl font-semibold text-white mb-1 flex items-center">
-          <Calendar className="h-5 w-5 text-gold-500 mr-2" />
+        <h2 className="text-lg sm:text-xl font-semibold text-white mb-1 flex items-center">
+          <Calendar className="h-5 w-5 text-gold-500 mr-2 flex-shrink-0" />
           {t('a.wt.specialTitle')}
         </h2>
         <p className="text-sm text-gray-400 mb-4">
@@ -319,10 +319,10 @@ export default function WorkingTime() {
 function SpecialDayRow({ day, onDelete }) {
   const { t, dateLocale } = useLanguage()
   return (
-    <div className="flex justify-between items-center p-3 bg-dark-700 rounded-lg">
-      <div>
-        <p className="text-white font-medium">{format(parseISO(day.date), 'PPPP', { locale: dateLocale })}</p>
-        <p className="text-xs text-gray-400">
+    <div className="flex items-start sm:items-center justify-between gap-3 p-3 bg-dark-700 rounded-lg">
+      <div className="min-w-0">
+        <p className="text-white font-medium break-words">{format(parseISO(day.date), 'PPPP', { locale: dateLocale })}</p>
+        <p className="text-xs text-gray-400 break-words">
           {day.type === 'closed' ? t('a.wt.closedAllDay') : `${t('a.wt.openFrom')} ${hhmm(day.open_time)} ${t('a.wt.to')} ${hhmm(day.close_time)}`}
           {day.reason && `, ${day.reason}`}
         </p>

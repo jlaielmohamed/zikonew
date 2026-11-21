@@ -34,8 +34,8 @@ export default function ShopSettings() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-white mb-6 flex items-center">
-        <Settings className="h-8 w-8 text-gold-500 mr-3" />
+      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 flex items-center">
+        <Settings className="h-6 w-6 sm:h-8 sm:w-8 text-gold-500 mr-3 flex-shrink-0" />
         {t('a.menu.settings')}
       </h1>
 
@@ -71,7 +71,7 @@ export default function ShopSettings() {
             <input type="checkbox" checked={settings.is_open_for_booking || false} onChange={(e) => setSettings({...settings, is_open_for_booking: e.target.checked})} />
             <label className="text-gray-300">{t('a.st.openForBooking')}</label>
           </div>
-          <button type="submit" className="btn-primary">{t('a.st.save')}</button>
+          <button type="submit" className="btn-primary w-full sm:w-auto">{t('a.st.save')}</button>
         </form>
       </div>
     </div>

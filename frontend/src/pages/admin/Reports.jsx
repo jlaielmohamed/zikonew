@@ -22,20 +22,20 @@ export default function Reports() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-white mb-6 flex items-center">
-        <FileText className="h-8 w-8 text-gold-500 mr-3" />
+      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 flex items-center">
+        <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-gold-500 mr-3 flex-shrink-0" />
         {t('a.menu.reports')}
       </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div className="card">
-          <h2 className="text-xl font-semibold text-white mb-4">{t('a.rp.revenue')}</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">{t('a.rp.revenue')}</h2>
           <p className="text-3xl font-bold text-gold-500">{formatPrice(stats?.revenue || 0)}</p>
           <p className="text-gray-400">{t('a.rp.last30')}</p>
         </div>
 
         <div className="card">
-          <h2 className="text-xl font-semibold text-white mb-4">{t('a.ov.topServices')}</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">{t('a.ov.topServices')}</h2>
           <div className="space-y-2">
             {stats?.top_services?.map((service, idx) => (
               <div key={idx} className="flex justify-between">
