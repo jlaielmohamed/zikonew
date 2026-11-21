@@ -113,9 +113,9 @@ Replace `YOUR_AUTH_USER_UUID` with the actual user ID from Authentication → Us
 1. As Ziko (admin), open **Admin → Barbers** and click **Add barber**.
 2. Fill in the barber's name/bio and the **login email + password** you want him to use. The function creates the Supabase Auth user and links it to the barber profile.
 3. Existing barbers can be edited the same way: use the **Edit** button to link a login or reset a password/email.
-4. The barber clicks **"I am a barber"** on the login page (or in the navbar), signs in, and lands on `/barber`.
+4. The barber clicks **"I am a barber"** on the login page (or in the navbar), signs in, and lands on `/barber`. He can use the password Ziko gave him or **Continue with Google** with that exact same email; Supabase links the Google identity to the same barber account.
 5. In his dashboard he can:
-   - accept/decline bookings (this triggers the customer email),
+   - see **Booking requests** and accept/decline only his own pending bookings (the customer email is sent automatically),
    - choose which shop services he offers and set **his own price and duration** for each,
    - edit his weekly hours and add time off,
    - change his login email/password under **Account**.
@@ -176,6 +176,7 @@ npm run build
 - **No service role key in frontend** - Only used in Edge Function
 - **Email confirmation disabled** for instant sign-in as requested
 - **Email notifications via Resend**: the barber is emailed on a new booking, and the customer is emailed when the booking is accepted or declined
+- **Per-barber decisions**: each barber sees and accepts/declines only his own bookings; `decide_booking` also enforces this on the server
 - **Per-barber pricing**: `create_booking` charges the price the barber set for that service; the shop price is used as the default
 - **No Google Calendar integration**
 - **No mock data or local storage for app data**

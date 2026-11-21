@@ -110,6 +110,7 @@ export const translations = {
     'barberLogin.signIn': 'Go to my dashboard',
     'barberLogin.signingIn': 'Signing in...',
     'barberLogin.wrongRole': 'This account is not a barber account. Ask Ziko for access.',
+    'barberLogin.googleHint': 'Use the same Google email Ziko registered for you.',
 
     // Barber dashboard
     'b.menu.appointments': 'Appointments',
@@ -122,6 +123,8 @@ export const translations = {
     'b.today': "Today's appointments",
     'b.pending': 'Pending',
     'b.accepted': 'Accepted',
+    'b.pendingRequests': 'Booking requests',
+    'b.noPending': 'No pending requests',
     'b.todaySchedule': "Today's schedule",
     'b.noAppointments': 'No appointments today',
     'b.accept': 'Accept',
@@ -413,6 +416,7 @@ export const translations = {
     'barberLogin.signIn': 'Accéder à mon espace',
     'barberLogin.signingIn': 'Connexion...',
     'barberLogin.wrongRole': 'Ce compte n’est pas un compte coiffeur. Demandez l’accès à Ziko.',
+    'barberLogin.googleHint': 'Utilisez la même adresse Google que celle enregistrée par Ziko.',
 
     // Barber dashboard
     'b.menu.appointments': 'Rendez-vous',
@@ -425,6 +429,8 @@ export const translations = {
     'b.today': 'Rendez-vous du jour',
     'b.pending': 'En attente',
     'b.accepted': 'Acceptée',
+    'b.pendingRequests': 'Demandes de réservation',
+    'b.noPending': 'Aucune demande en attente',
     'b.todaySchedule': 'Planning du jour',
     'b.noAppointments': 'Aucun rendez-vous aujourd’hui',
     'b.accept': 'Accepter',
