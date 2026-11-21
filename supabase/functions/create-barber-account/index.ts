@@ -10,6 +10,15 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+async function findUserByEmail(admin: any, email: string) {
+  const normalized = email.trim().toLowerCase();
+  const { data, error } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+  if (error) throw error;
+  return (data?.users || []).find(
+    (user: any) => user.email?.toLowerCase() === normalized
+  ) || null;
+}
+
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
@@ -70,26 +79,69 @@ serve(async (req) => {
     let userId = barber.profile_id;
 
     if (!userId) {
-      // No account yet: create one and link it to this barber.
+      // No account linked yet. Reuse an existing auth user if the email is
+      // already registered, otherwise create one.
       if (!email || !password) {
         throw new Error("Email and password are required for a new barber account");
       }
 
-      const { data: authData, error: authError } =
-        await supabaseAdmin.auth.admin.createUser({
-          email,
-          password,
-          email_confirm: true,
-          user_metadata: { full_name: full_name || barber.display_name },
-        });
+      const normalizedEmail = email.trim().toLowerCase();
+      const existingUser = await findUserByEmail(supabaseAdmin, normalizedEmail);
 
-      if (authError) throw authError;
-      userId = authData.user.id;
+      if (existingUser) {
+        const { data: existingProfile } = await supabaseAdmin
+          .from("profiles")
+          .select("role")
+          .eq("id", existingUser.id)
+          .maybeSingle();
+
+        if (existingProfile?.role === "admin") {
+          throw new Error(
+            "This email is already used by the admin account. Use a different email for the barber."
+          );
+        }
+
+        const { data: linkedBarber } = await supabaseAdmin
+          .from("barbers")
+          .select("id")
+          .eq("profile_id", existingUser.id)
+          .maybeSingle();
+
+        if (linkedBarber && linkedBarber.id !== barber_id) {
+          throw new Error("This email is already linked to another barber.");
+        }
+
+        userId = existingUser.id;
+
+        if (password) {
+          const { error: passwordError } =
+            await supabaseAdmin.auth.admin.updateUserById(userId, { password });
+          if (passwordError) throw passwordError;
+        }
+      } else {
+        const { data: authData, error: authError } =
+          await supabaseAdmin.auth.admin.createUser({
+            email: normalizedEmail,
+            password,
+            email_confirm: true,
+            user_metadata: { full_name: full_name || barber.display_name },
+          });
+
+        if (authError) throw authError;
+        userId = authData.user.id;
+      }
 
       const { error: profileError } = await supabaseAdmin
         .from("profiles")
-        .update({ role: "barber", full_name, phone })
-        .eq("id", userId);
+        .upsert(
+          {
+            id: userId,
+            role: "barber",
+            full_name: full_name || barber.display_name,
+            phone: phone || null,
+          },
+          { onConflict: "id" }
+        );
 
       if (profileError) throw profileError;
 
@@ -111,17 +163,14 @@ serve(async (req) => {
         if (updateError) throw updateError;
       }
 
-      const profileUpdates: Record<string, string> = {};
+      const profileUpdates: Record<string, string> = { id: userId, role: "barber" };
       if (full_name) profileUpdates.full_name = full_name;
       if (phone) profileUpdates.phone = phone;
 
-      if (Object.keys(profileUpdates).length > 0) {
-        const { error: profileError } = await supabaseAdmin
-          .from("profiles")
-          .update(profileUpdates)
-          .eq("id", userId);
-        if (profileError) throw profileError;
-      }
+      const { error: profileError } = await supabaseAdmin
+        .from("profiles")
+        .upsert(profileUpdates, { onConflict: "id" });
+      if (profileError) throw profileError;
     }
 
     return new Response(

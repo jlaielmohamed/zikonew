@@ -110,7 +110,11 @@ export default function Barbers() {
             await supabase.from('barbers').delete().eq('id', barberId)
           }
           console.error(functionError)
-          toast.error(t('a.br.createError'))
+          const context = functionError?.context
+          const detail =
+            (typeof context === 'string' ? context : context?.error || context?.message) ||
+            functionError?.message
+          toast.error(`${t('a.br.createError')}${detail ? ` ${detail}` : ''}`)
           return
         }
       }
