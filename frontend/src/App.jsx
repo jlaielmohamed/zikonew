@@ -1,5 +1,10 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import {
+  BARBER_GOOGLE_LOGIN_FLAG,
+  BARBER_GOOGLE_WRONG_ROLE_FLAG,
+} from './config/authFlags'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import Booking from './pages/Booking'
@@ -25,7 +30,26 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 }
 
 function AppRoutes() {
-  const { profile, loading } = useAuth()
+  const { user, profile, loading, signOut } = useAuth()
+  const navigate = useNavigate()
+
+  // Google sign-in from the barber page returns to the allowed site root.
+  // Continue to the barber dashboard only if the account is really a barber.
+  useEffect(() => {
+    if (loading || !sessionStorage.getItem(BARBER_GOOGLE_LOGIN_FLAG)) return
+
+    sessionStorage.removeItem(BARBER_GOOGLE_LOGIN_FLAG)
+
+    if (!user) return
+
+    if (profile?.role === 'barber') {
+      navigate('/barber', { replace: true })
+    } else {
+      sessionStorage.setItem(BARBER_GOOGLE_WRONG_ROLE_FLAG, '1')
+      signOut()
+      navigate('/barber-login', { replace: true })
+    }
+  }, [loading, user, profile, navigate, signOut])
   
   if (loading) return <Loading />
   

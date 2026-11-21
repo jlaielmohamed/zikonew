@@ -1,43 +1,28 @@
-import { useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 import { useLanguage } from '../i18n/LanguageContext'
+import {
+  BARBER_GOOGLE_LOGIN_FLAG,
+  BARBER_GOOGLE_WRONG_ROLE_FLAG,
+} from '../config/authFlags'
 
 export default function BarberLogin() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const {
-    signIn,
-    signOut,
-    signInWithGoogle,
-    user,
-    profile,
-    loading: authLoading,
-  } = useAuth()
+  const { signIn, signOut, signInWithGoogle } = useAuth()
   const { t } = useLanguage()
   const navigate = useNavigate()
-  const location = useLocation()
-  const googleCheckedRef = useRef(false)
-  const isGoogleCallback = new URLSearchParams(location.search).get('google') === '1'
 
-  // After Google redirects back, make sure this account really belongs to a
-  // barber before opening the dashboard.
   useEffect(() => {
-    if (!isGoogleCallback || authLoading || googleCheckedRef.current || !user) return
-
-    googleCheckedRef.current = true
-
-    if (profile?.role !== 'barber') {
-      signOut()
+    if (sessionStorage.getItem(BARBER_GOOGLE_WRONG_ROLE_FLAG) === '1') {
+      sessionStorage.removeItem(BARBER_GOOGLE_WRONG_ROLE_FLAG)
       toast.error(t('barberLogin.wrongRole'))
-      return
     }
-
-    navigate('/barber', { replace: true })
-  }, [isGoogleCallback, authLoading, user, profile, navigate, signOut, t])
+  }, [t])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -74,15 +59,18 @@ export default function BarberLogin() {
   const handleGoogle = async () => {
     setLoading(true)
 
-    const { error } = await signInWithGoogle(
-      `${window.location.origin}/barber-login?google=1`
-    )
+    // Use the same redirect URL as the working main login page. Supabase only
+    // allows the site root here; the flag lets AppRoutes continue to /barber.
+    sessionStorage.setItem(BARBER_GOOGLE_LOGIN_FLAG, '1')
+
+    const { error } = await signInWithGoogle()
 
     if (error) {
+      sessionStorage.removeItem(BARBER_GOOGLE_LOGIN_FLAG)
       toast.error(error.message)
       setLoading(false)
     }
-    // On success Supabase redirects to Google and back to this page.
+    // On success Supabase redirects to Google and back to the site root.
   }
 
   return (
