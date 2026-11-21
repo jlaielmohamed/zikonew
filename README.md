@@ -115,7 +115,7 @@ Replace `YOUR_AUTH_USER_UUID` with the actual user ID from Authentication → Us
 3. Existing barbers can be edited the same way: use the **Edit** button to link a login or reset a password/email.
 4. The barber signs in on the single `/login` page with the password Ziko gave him, or with **Continue with Google** using that exact same email. The app detects the role and opens `/barber` for him and `/admin` for Ziko.
 5. In his dashboard he can:
-   - see **Booking requests** and accept/decline only his own pending bookings (the customer email is sent automatically),
+   - see **Booking requests** and accept/decline only his own pending bookings (the customer email is sent automatically), then see accepted bookings under **Accepted appointments**,
    - choose which shop services he offers and set **his own price and duration** for each,
    - edit his weekly hours and add time off,
    - change his login email/password under **Account**.

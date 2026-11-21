@@ -87,6 +87,8 @@ export default function BarberDashboard() {
 
   const pendingBookings = bookings.filter((b) => b.status === 'pending')
 
+  const acceptedBookings = bookings.filter((b) => b.status === 'accepted')
+
   const todayBookings = bookings.filter((b) =>
     format(new Date(b.starts_at), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
   )
@@ -198,7 +200,7 @@ export default function BarberDashboard() {
                   <div>
                     <p className="text-gray-400 text-sm">{t('b.pending')}</p>
                     <p className="text-2xl font-bold text-yellow-500">
-                      {bookings.filter((b) => b.status === 'pending').length}
+                      {pendingBookings.length}
                     </p>
                   </div>
                   <Clock className="h-8 w-8 text-yellow-500" />
@@ -210,7 +212,7 @@ export default function BarberDashboard() {
                   <div>
                     <p className="text-gray-400 text-sm">{t('b.accepted')}</p>
                     <p className="text-2xl font-bold text-green-500">
-                      {bookings.filter((b) => b.status === 'accepted').length}
+                      {acceptedBookings.length}
                     </p>
                   </div>
                   <Check className="h-8 w-8 text-green-500" />
@@ -252,6 +254,40 @@ export default function BarberDashboard() {
               )}
             </div>
 
+            <div className="card mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-white">{t('b.acceptedAppointments')}</h2>
+                <span className="px-2 py-1 rounded text-xs bg-green-500/10 text-green-500">
+                  {acceptedBookings.length}
+                </span>
+              </div>
+              {acceptedBookings.length === 0 ? (
+                <p className="text-gray-400 text-center py-8">{t('b.noAccepted')}</p>
+              ) : (
+                <div className="space-y-3">
+                  {acceptedBookings.map((booking) => (
+                    <div key={booking.id} className="flex flex-col sm:flex-row sm:justify-between gap-4 p-4 bg-dark-700 rounded">
+                      {renderBookingInfo(booking)}
+                      <div className="flex space-x-2 sm:items-start">
+                        <button
+                          onClick={() => handleUpdateStatus(booking.id, 'completed')}
+                          className="btn-primary text-sm"
+                        >
+                          {t('b.complete')}
+                        </button>
+                        <button
+                          onClick={() => handleUpdateStatus(booking.id, 'no_show')}
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
+                        >
+                          {t('b.noShow')}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <div className="card">
               <h2 className="text-xl font-semibold text-white mb-4">{t('b.todaySchedule')}</h2>
               {todayBookings.length === 0 ? (
@@ -259,24 +295,8 @@ export default function BarberDashboard() {
               ) : (
                 <div className="space-y-3">
                   {todayBookings.map((booking) => (
-                    <div key={booking.id} className="flex flex-col sm:flex-row sm:justify-between gap-4 p-4 bg-dark-700 rounded">
+                    <div key={booking.id} className="p-4 bg-dark-700 rounded">
                       {renderBookingInfo(booking)}
-                      {booking.status === 'accepted' && (
-                        <div className="flex space-x-2 sm:items-start">
-                          <button
-                            onClick={() => handleUpdateStatus(booking.id, 'completed')}
-                            className="btn-primary text-sm"
-                          >
-                            {t('b.complete')}
-                          </button>
-                          <button
-                            onClick={() => handleUpdateStatus(booking.id, 'no_show')}
-                            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
-                          >
-                            {t('b.noShow')}
-                          </button>
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
