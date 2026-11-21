@@ -1,7 +1,8 @@
 import { serve } from "https://deno.land/std/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// Barber emails. Keys can be barber IDs (UUIDs) or names.
-// Add the UUIDs as extra keys later if you want strict ID-based routing.
+// Fallback emails, used only when the account email cannot be resolved.
+// Keys can be barber IDs (UUIDs) or names.
 const BARBER_EMAILS: Record<string, string> = {
   ziko: "mohamedjlaiel.pro@gmail.com",
   yassine: "mohamedjlaiel5000@gmail.com",
@@ -43,7 +44,7 @@ function statusLabel(status: string): string {
   return labels[status] || status;
 }
 
-function barberEmailFor(barberId: string, barberName: string): string {
+function fallbackBarberEmail(barberId: string, barberName: string): string {
   const id = barberId.toLowerCase();
   const name = barberName.toLowerCase();
 
@@ -51,6 +52,55 @@ function barberEmailFor(barberId: string, barberName: string): string {
   if (name.includes("ziko")) return BARBER_EMAILS.ziko;
   if (name.includes("yassine") || name.includes("yacine")) return BARBER_EMAILS.yassine;
   return "";
+}
+
+// The live recipient is the email on the barber's auth account, so changing it
+// in Admin -> Barbers (or in the barber's My account) takes effect immediately.
+async function barberEmailFor(barberId: string, barberName: string): Promise<string> {
+  const fallback = fallbackBarberEmail(barberId, barberName);
+  const url = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+  if (!url || !serviceKey) return fallback;
+
+  try {
+    const admin = createClient(url, serviceKey);
+    let profileId: string | null = null;
+
+    if (barberId) {
+      const { data: barber } = await admin
+        .from("barbers")
+        .select("profile_id")
+        .eq("id", barberId)
+        .maybeSingle();
+      profileId = barber?.profile_id ?? null;
+    }
+
+    // Ziko's barber row is not linked to his profile, so use the admin account.
+    if (!profileId && barberName.toLowerCase().includes("ziko")) {
+      const { data: adminProfile } = await admin
+        .from("profiles")
+        .select("id")
+        .eq("role", "admin")
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      profileId = adminProfile?.id ?? null;
+    }
+
+    if (profileId) {
+      const { data, error } = await admin.auth.admin.getUserById(profileId);
+      if (!error && data.user) {
+        // new_email holds a pending, not-yet-confirmed change.
+        const email = data.user.new_email || data.user.email || "";
+        if (email) return email;
+      }
+    }
+  } catch (error) {
+    console.error("Could not resolve barber email from auth:", error);
+  }
+
+  return fallback;
 }
 
 function shell(content: string): string {
@@ -109,7 +159,7 @@ serve(async (req) => {
     let ownerEmailSent = null;
 
     if (isInsert) {
-      const barberEmail = barberEmailFor(barberId, barberName);
+      const barberEmail = await barberEmailFor(barberId, barberName);
 
       if (!barberEmail) {
         return new Response(

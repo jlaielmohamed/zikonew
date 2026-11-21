@@ -58,7 +58,7 @@ A complete barbershop booking platform built with React, Tailwind CSS, and Supab
    supabase secrets set TURNSTILE_SECRET_KEY=your_turnstile_secret_key
    ```
    The `EMAIL_FROM` domain must be verified in Resend. Dates in the emails use `Africa/Tunis` and the emails are written in French. Never put `TURNSTILE_SECRET_KEY` in the frontend or in `.env`.
-6. The barber emails are already set in `supabase/functions/send-booking-email/index.ts` (Ziko → mohamedjlaiel.pro@gmail.com, Yassine → mohamedjlaiel5000@gmail.com). Routing uses the barber's name; add UUID keys to `BARBER_EMAILS` if you prefer strict ID-based routing.
+6. Booking notifications are sent to the email on the barber's Supabase Auth account. Changing a barber's email in **Admin → Barbers** or in the barber's **My account** changes the recipient automatically. The `BARBER_EMAILS` map in `supabase/functions/send-booking-email/index.ts` is only a fallback if the account email cannot be resolved. For Ziko's bookings (his barber row has no linked profile), the function uses the admin account's email.
 
 ### Booking email flow
 
@@ -73,7 +73,7 @@ Create one Database Webhook in the Supabase dashboard:
 
 How it behaves:
 
-- **Insert** (new booking) → emails the selected barber from the `BARBER_EMAILS` map.
+- **Insert** (new booking) → emails the selected barber at the address on his account (fallback: `BARBER_EMAILS`).
 - **Update** where `status` changes to `accepted` or `denied` → emails the address entered in the booking form, with the result and the denial reason if any.
 
 To test manually, call the function with a webhook-shaped body:
