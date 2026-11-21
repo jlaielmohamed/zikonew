@@ -7,6 +7,7 @@ import LanguageSwitcher from './LanguageSwitcher'
 
 export default function Navbar() {
   const { user, profile, signOut, isAdmin, isBarber } = useAuth()
+  const isStaff = isAdmin || isBarber
   const [isOpen, setIsOpen] = useState(false)
   const { t } = useLanguage()
 
@@ -30,10 +31,10 @@ export default function Navbar() {
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               <Link to="/" className="text-gray-300 hover:text-gold-500 px-3 py-2">{t('nav.home')}</Link>
-              {!isBarber && <Link to="/booking" className="text-gray-300 hover:text-gold-500 px-3 py-2">{t('nav.bookNow')}</Link>}
+              {!isStaff && <Link to="/booking" className="text-gray-300 hover:text-gold-500 px-3 py-2">{t('nav.bookNow')}</Link>}
               {user ? (
                 <>
-                  {!isBarber && <Link to="/my-bookings" className="text-gray-300 hover:text-gold-500 px-3 py-2">{t('nav.myBookings')}</Link>}
+                  {!isStaff && <Link to="/my-bookings" className="text-gray-300 hover:text-gold-500 px-3 py-2">{t('nav.myBookings')}</Link>}
                   {isAdmin && <Link to="/admin" className="text-gold-500 px-3 py-2">{t('nav.admin')}</Link>}
                   {isBarber && <Link to="/barber" className="text-gold-500 px-3 py-2">{t('nav.barber')}</Link>}
                   <span className="text-gray-400 px-3 py-2">{profile?.full_name || user.email}</span>
@@ -60,10 +61,10 @@ export default function Navbar() {
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-dark-800">
             <Link to="/" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-gold-500 block px-3 py-2">{t('nav.home')}</Link>
-            {!isBarber && <Link to="/booking" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-gold-500 block px-3 py-2">{t('nav.bookNow')}</Link>}
+            {!isStaff && <Link to="/booking" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-gold-500 block px-3 py-2">{t('nav.bookNow')}</Link>}
             {user ? (
               <>
-                {!isBarber && <Link to="/my-bookings" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-gold-500 block px-3 py-2">{t('nav.myBookings')}</Link>}
+                {!isStaff && <Link to="/my-bookings" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-gold-500 block px-3 py-2">{t('nav.myBookings')}</Link>}
                 {isAdmin && <Link to="/admin" onClick={() => setIsOpen(false)} className="text-gold-500 block px-3 py-2">{t('nav.adminDashboard')}</Link>}
                 {isBarber && <Link to="/barber" onClick={() => setIsOpen(false)} className="text-gold-500 block px-3 py-2">{t('nav.barberDashboard')}</Link>}
                 <div className="text-gray-400 px-3 py-2">{profile?.full_name || user.email}</div>

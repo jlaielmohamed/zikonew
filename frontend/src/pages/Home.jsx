@@ -16,7 +16,8 @@ const FACEBOOK_URL = 'https://www.facebook.com/wassim.zekri.9'
 const INSTAGRAM_URL = 'https://www.instagram.com/ziko_hairstyle/'
 
 export default function Home() {
-  const { isBarber } = useAuth()
+  const { isAdmin, isBarber } = useAuth()
+  const isStaff = isAdmin || isBarber
   const { t, formatPrice } = useLanguage()
   const [shopSettings, setShopSettings] = useState(null)
   const [services, setServices] = useState([])
@@ -83,9 +84,9 @@ export default function Home() {
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
             {shopSettings?.description || t('home.defaultDescription')}
           </p>
-          {isBarber ? (
-            <Link to="/barber" className="btn-primary text-lg px-8 py-3 inline-block">
-              {t('nav.barberDashboard')}
+          {isStaff ? (
+            <Link to={isAdmin ? '/admin' : '/barber'} className="btn-primary text-lg px-8 py-3 inline-block">
+              {isAdmin ? t('nav.adminDashboard') : t('nav.barberDashboard')}
             </Link>
           ) : (
             <Link to="/booking" className="btn-primary text-lg px-8 py-3 inline-block">
@@ -252,7 +253,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      {!isBarber && (
+      {!isStaff && (
         <section className="py-16 bg-gradient-to-r from-gold-600 to-gold-500">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold text-black mb-4">{t('home.ctaTitle')}</h2>

@@ -52,7 +52,10 @@ function AppRoutes() {
     }
   }, [loading, user, profile, navigate, signOut])
 
+  const isAdmin = profile?.role === 'admin'
   const isBarber = profile?.role === 'barber'
+  const isStaff = isAdmin || isBarber
+  const staffHome = isAdmin ? '/admin' : '/barber'
   
   if (loading) return <Loading />
   
@@ -61,11 +64,11 @@ function AppRoutes() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/booking" element={isBarber ? <Navigate to="/barber" replace /> : <Booking />} />
+        <Route path="/booking" element={isStaff ? <Navigate to={staffHome} replace /> : <Booking />} />
         <Route path="/login" element={<Login />} />
         <Route
           path="/my-bookings"
-          element={isBarber ? <Navigate to="/barber" replace /> : <ProtectedRoute><MyBookings /></ProtectedRoute>}
+          element={isStaff ? <Navigate to={staffHome} replace /> : <ProtectedRoute><MyBookings /></ProtectedRoute>}
         />
         <Route path="/admin/*" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
         <Route path="/barber/*" element={<ProtectedRoute requiredRole="barber"><BarberDashboard /></ProtectedRoute>} />
