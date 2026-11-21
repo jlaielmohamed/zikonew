@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
@@ -99,11 +99,6 @@ export default function BarberLogin() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500">
-          <Link to="/register" className="text-gold-500 hover:text-gold-400">
-            {t('barberLogin.customerLink')}
-          </Link>
-        </p>
       </div>
     </div>
   )

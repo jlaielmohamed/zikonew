@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
@@ -9,7 +8,6 @@ import { useLanguage } from '../i18n/LanguageContext'
 export default function Booking() {
   const { user, profile } = useAuth()
   const { t, formatPrice, dateLocale } = useLanguage()
-  const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [services, setServices] = useState([])
   const [barbers, setBarbers] = useState([])
@@ -24,6 +22,7 @@ export default function Booking() {
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const [shopSettings, setShopSettings] = useState(null)
+  const [bookingDone, setBookingDone] = useState(false)
 
   useEffect(() => {
     fetchData()
@@ -83,7 +82,7 @@ export default function Booking() {
       if (error) throw error
       
       toast.success(t('booking.success'))
-      navigate('/my-bookings')
+      setBookingDone(true)
     } catch (error) {
       toast.error(error.message)
     } finally {
@@ -103,6 +102,37 @@ export default function Booking() {
   const dates = []
   for (let i = 0; i < (shopSettings?.max_days_ahead || 30); i++) {
     dates.push(format(addDays(new Date(), i), 'yyyy-MM-dd'))
+  }
+
+  const startAnother = () => {
+    setBookingDone(false)
+    setStep(1)
+    setSelectedService(null)
+    setSelectedBarber(null)
+    setSelectedSlot(null)
+    setAvailableSlots([])
+    setGuestName('')
+    setGuestPhone('')
+    setNotes('')
+    setCustomerEmail(user?.email || '')
+  }
+
+  // Guests do not have an account, so show a confirmation instead of the
+  // login-protected "My Bookings" page.
+  if (bookingDone) {
+    return (
+      <div className="min-h-screen flex items-center justify-center py-8 px-4">
+        <div className="card max-w-xl w-full text-center">
+          <h1 className="text-3xl font-bold text-gold-500 mb-4">{t('booking.doneTitle')}</h1>
+          <p className="text-gray-300 mb-2">{t('booking.doneText')}</p>
+          <p className="text-white font-semibold mb-8">{customerEmail}</p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <button onClick={startAnother} className="btn-primary">{t('booking.another')}</button>
+            <a href="/" className="btn-secondary">{t('nav.home')}</a>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

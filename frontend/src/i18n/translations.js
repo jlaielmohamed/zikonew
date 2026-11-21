@@ -10,7 +10,6 @@ export const translations = {
     'nav.barberDashboard': 'Barber Dashboard',
     'nav.signOut': 'Sign Out',
     'nav.login': 'Login',
-    'nav.register': 'Register',
     'nav.language': 'Language',
 
     // Home
@@ -70,6 +69,9 @@ export const translations = {
     'booking.booking': 'Booking...',
     'booking.slotsError': 'Error fetching available slots',
     'booking.success': 'Booking created successfully!',
+    'booking.doneTitle': 'Booking requested!',
+    'booking.doneText': 'We will email you when the barber accepts or declines your booking, at:',
+    'booking.another': 'Book another appointment',
 
     // My bookings
     'my.title': 'My Bookings',
@@ -90,15 +92,9 @@ export const translations = {
     // Auth
     'login.title': 'Sign in to your account',
     'login.or': 'Or',
-    'login.createLink': 'create a new account',
     'login.signIn': 'Sign in',
     'login.signingIn': 'Signing in...',
     'login.success': 'Login successful!',
-    'register.title': 'Create your account',
-    'register.signInLink': 'sign in to existing account',
-    'register.create': 'Create account',
-    'register.creating': 'Creating account...',
-    'register.success': 'Account created successfully!',
     'auth.email': 'Email address',
     'auth.password': 'Password',
     'auth.fullName': 'Full Name',
@@ -111,7 +107,6 @@ export const translations = {
     'barberLogin.signIn': 'Go to my dashboard',
     'barberLogin.signingIn': 'Signing in...',
     'barberLogin.wrongRole': 'This account is not a barber account. Ask Ziko for access.',
-    'barberLogin.customerLink': 'Not a barber? Create a customer account',
 
     // Barber dashboard
     'b.menu.appointments': 'Appointments',
@@ -320,7 +315,6 @@ export const translations = {
     'nav.barberDashboard': 'Espace coiffeur',
     'nav.signOut': 'Se déconnecter',
     'nav.login': 'Connexion',
-    'nav.register': 'Inscription',
     'nav.language': 'Langue',
 
     // Home
@@ -380,6 +374,9 @@ export const translations = {
     'booking.booking': 'Réservation en cours...',
     'booking.slotsError': 'Erreur lors du chargement des créneaux',
     'booking.success': 'Réservation créée avec succès !',
+    'booking.doneTitle': 'Demande envoyée !',
+    'booking.doneText': 'Nous vous enverrons un e-mail lorsque le coiffeur acceptera ou refusera votre réservation, à :',
+    'booking.another': 'Prendre un autre rendez-vous',
 
     // My bookings
     'my.title': 'Mes réservations',
@@ -400,15 +397,9 @@ export const translations = {
     // Auth
     'login.title': 'Connectez-vous à votre compte',
     'login.or': 'Ou',
-    'login.createLink': 'créez un nouveau compte',
     'login.signIn': 'Se connecter',
     'login.signingIn': 'Connexion...',
     'login.success': 'Connexion réussie !',
-    'register.title': 'Créez votre compte',
-    'register.signInLink': 'connectez-vous à un compte existant',
-    'register.create': 'Créer le compte',
-    'register.creating': 'Création du compte...',
-    'register.success': 'Compte créé avec succès !',
     'auth.email': 'Adresse e-mail',
     'auth.password': 'Mot de passe',
     'auth.fullName': 'Nom complet',
@@ -421,7 +412,6 @@ export const translations = {
     'barberLogin.signIn': 'Accéder à mon espace',
     'barberLogin.signingIn': 'Connexion...',
     'barberLogin.wrongRole': 'Ce compte n’est pas un compte coiffeur. Demandez l’accès à Ziko.',
-    'barberLogin.customerLink': 'Vous n’êtes pas coiffeur ? Créer un compte client',
 
     // Barber dashboard
     'b.menu.appointments': 'Rendez-vous',

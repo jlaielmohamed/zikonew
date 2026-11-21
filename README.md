@@ -87,11 +87,11 @@ curl -X POST https://YOUR_PROJECT_REF.supabase.co/functions/v1/send-booking-emai
 1. Go to Authentication → Settings
 2. **Email Auth**: Enable email provider, turn OFF "Confirm email" for instant sign-in
 3. **Google Auth**: Go to Authentication → Providers → Google, enable it, and add your Google OAuth `client_id` and `client_secret` from Google Cloud Console. Add `<SITE_URL>/auth/v1/callback` to the Authorized Redirect URIs in Google Cloud Console (Supabase shows the exact callback URL on the provider page).
-4. **Site URL**: Set to your frontend URL (e.g., `http://localhost:5173` for dev, or your deployed URL). The "Continue with Google" buttons on the sign-in and sign-up pages redirect back to this URL.
+4. **Site URL**: Set to your frontend URL (e.g., `http://localhost:5173` for dev, or your deployed URL). The "Continue with Google" button on the sign-in page redirects back to this URL.
 
 ### 6. Create First Admin
 
-1. Sign up a user through your app or Supabase Auth
+1. Create Ziko's user in Supabase → **Authentication → Users → Add user** (there is no public sign-up page; customers book as guests)
 2. Go to SQL Editor and run:
 ```sql
 UPDATE profiles SET role = 'admin' WHERE id = 'YOUR_AUTH_USER_UUID';
@@ -161,6 +161,7 @@ npm run build
 
 ## Important Notes
 
+- **No customer accounts** - Customers book as guests with their email; only Ziko and barbers have logins
 - **No service role key in frontend** - Only used in Edge Function
 - **Email confirmation disabled** for instant sign-in as requested
 - **Email notifications via Resend**: the barber is emailed on a new booking, and the customer is emailed when the booking is accepted or declined

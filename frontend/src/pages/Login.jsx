@@ -48,12 +48,9 @@ export default function Login() {
             <img src="/logo.jpg" alt="Ziko Hairstyle" className="h-20 w-20 rounded-full object-cover" />
           </div>
           <h2 className="mt-6 text-3xl font-bold text-white">{t('login.title')}</h2>
-          <div className="mt-4 flex flex-col items-center gap-2">
-            <Link to="/barber-login" className="btn-secondary w-full max-w-xs text-center">
+          <div className="mt-4">
+            <Link to="/barber-login" className="btn-secondary w-full max-w-xs text-center block mx-auto">
               {t('nav.barberLogin')}
-            </Link>
-            <Link to="/register" className="text-sm text-gray-500 hover:text-gold-500">
-              {t('login.createLink')}
             </Link>
           </div>
         </div>
