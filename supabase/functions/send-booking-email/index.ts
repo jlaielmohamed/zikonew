@@ -74,6 +74,8 @@ serve(async (req) => {
     const record = body.record || {};
     const oldRecord = body.old_record || {};
     const eventType = body.type || body.event || "";
+    const isInsert = eventType === "INSERT" || eventType === "booking.created";
+    const isUpdate = eventType === "UPDATE" || eventType === "booking.decided";
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
 
@@ -106,7 +108,7 @@ serve(async (req) => {
     // 1) Email to the selected barber (new booking)
     let ownerEmailSent = null;
 
-    if (eventType === "INSERT" || eventType === "booking.created") {
+    if (isInsert) {
       const barberEmail = barberEmailFor(barberId, barberName);
 
       if (!barberEmail) {
@@ -152,9 +154,10 @@ serve(async (req) => {
     let customerEmailSent = null;
 
     const decided =
-      (eventType === "UPDATE" || eventType === "booking.decided") &&
+      isUpdate &&
       (status === "accepted" || status === "denied") &&
-      oldRecord.status !== status;
+      (!oldRecord.status || oldRecord.status !== status);
+
 
     if (decided && customerEmail) {
       const accepted = status === "accepted";
