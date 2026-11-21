@@ -8,7 +8,8 @@ A complete barbershop booking platform built with React, Tailwind CSS, and Supab
 - **Booking System**: Service → Barber → Date → Time slot selection with guest/customer support
 - **Customer Portal**: View and cancel bookings with real-time status updates
 - **Admin Dashboard**: Complete shop management with analytics, appointments, services, barbers, etc.
-- **Barber Dashboard**: Manage own schedule, mark appointments complete/no-show
+- **Barber Dashboard**: Accept/decline bookings, manage own prices, offered services, working hours, time off, and login credentials
+- **Barber Accounts**: Ziko creates each barber login from Admin → Barbers; barbers sign in from the "I am a barber" button and can change their email/password afterwards
 - **Real-time Updates**: Live booking notifications and status changes
 - **Role-based Access**: Customer, Barber, and Admin roles
 
@@ -30,6 +31,7 @@ A complete barbershop booking platform built with React, Tailwind CSS, and Supab
 1. Go to your Supabase project → SQL Editor
 2. Copy the entire contents of `supabase/migrations/20251028000000_init_ziko.sql` and run it
 3. Then run `supabase/migrations/20251121000000_booking_emails.sql`. It adds `customer_email`, `barber_name` and `service_name` to `bookings` and updates `create_booking`.
+4. Then run `supabase/migrations/20251122000000_barber_self_service.sql`. It adds per-barber prices/durations to `barber_services`, updates `get_available_slots` and `create_booking` to use them, and seeds a schedule when a new barber is added.
 
 ### 3. Create Storage Bucket
 
@@ -96,6 +98,20 @@ UPDATE profiles SET role = 'admin' WHERE id = 'YOUR_AUTH_USER_UUID';
 ```
 Replace `YOUR_AUTH_USER_UUID` with the actual user ID from Authentication → Users
 
+### Creating barber accounts
+
+1. As Ziko (admin), open **Admin → Barbers** and click **Add barber**.
+2. Fill in the barber's name/bio and the **login email + password** you want him to use. The function creates the Supabase Auth user and links it to the barber profile.
+3. Existing barbers can be edited the same way: use the **Edit** button to link a login or reset a password/email.
+4. The barber clicks **"I am a barber"** on the login page (or in the navbar), signs in, and lands on `/barber`.
+5. In his dashboard he can:
+   - accept/decline bookings (this triggers the customer email),
+   - choose which shop services he offers and set **his own price and duration** for each,
+   - edit his weekly hours and add time off,
+   - change his login email/password under **Account**.
+
+Deploy `create-barber-account` (step 4 above) before using the Add barber form. The function checks that the caller is an admin before it uses the service role key.
+
 ### 7. Setup Frontend
 
 1. Navigate to `frontend` directory:
@@ -148,6 +164,7 @@ npm run build
 - **No service role key in frontend** - Only used in Edge Function
 - **Email confirmation disabled** for instant sign-in as requested
 - **Email notifications via Resend**: the barber is emailed on a new booking, and the customer is emailed when the booking is accepted or declined
+- **Per-barber pricing**: `create_booking` charges the price the barber set for that service; the shop price is used as the default
 - **No Google Calendar integration**
 - **No mock data or local storage for app data**
 - **All business logic in Postgres functions** called via `supabase.rpc()`
@@ -158,7 +175,8 @@ npm run build
 
 After creating your admin account, you can login and access:
 - `/admin` - Admin Dashboard
-- `/barber` - Barber Dashboard (if linked)
+- `/barber-login` - Barber sign-in (account created by Ziko)
+- `/barber` - Barber Dashboard (after barber sign-in)
 - `/booking` - Book appointments
 - `/my-bookings` - Customer bookings
 

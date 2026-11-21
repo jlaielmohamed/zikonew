@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Booking from './pages/Booking'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import BarberLogin from './pages/BarberLogin'
 import MyBookings from './pages/MyBookings'
 import AdminDashboard from './pages/admin/Dashboard'
 import BarberDashboard from './pages/barber/Dashboard'
@@ -37,6 +38,7 @@ function AppRoutes() {
         <Route path="/booking" element={<Booking />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/barber-login" element={<BarberLogin />} />
         <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
         <Route path="/admin/*" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
         <Route path="/barber/*" element={<ProtectedRoute requiredRole="barber"><BarberDashboard /></ProtectedRoute>} />

@@ -48,12 +48,14 @@ export default function Login() {
             <img src="/logo.jpg" alt="Ziko Hairstyle" className="h-20 w-20 rounded-full object-cover" />
           </div>
           <h2 className="mt-6 text-3xl font-bold text-white">{t('login.title')}</h2>
-          <p className="mt-2 text-sm text-gray-400">
-            {t('login.or')}{' '}
-            <Link to="/register" className="text-gold-500 hover:text-gold-400">
+          <div className="mt-4 flex flex-col items-center gap-2">
+            <Link to="/barber-login" className="btn-secondary w-full max-w-xs text-center">
+              {t('nav.barberLogin')}
+            </Link>
+            <Link to="/register" className="text-sm text-gray-500 hover:text-gold-500">
               {t('login.createLink')}
             </Link>
-          </p>
+          </div>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">

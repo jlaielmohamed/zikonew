@@ -42,7 +42,8 @@ export default function Navbar() {
               ) : (
                 <>
                   <Link to="/login" className="text-gray-300 hover:text-gold-500 px-3 py-2">{t('nav.login')}</Link>
-                  <Link to="/register" className="btn-primary">{t('nav.register')}</Link>
+                  <Link to="/register" className="text-gray-300 hover:text-gold-500 px-3 py-2">{t('nav.register')}</Link>
+                  <Link to="/barber-login" className="btn-primary">{t('nav.barberLogin')}</Link>
                 </>
               )}
               <LanguageSwitcher className="ml-2" />
@@ -75,7 +76,8 @@ export default function Navbar() {
             ) : (
               <>
                 <Link to="/login" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-gold-500 block px-3 py-2">{t('nav.login')}</Link>
-                <Link to="/register" onClick={() => setIsOpen(false)} className="btn-primary block mx-3 text-center">{t('nav.register')}</Link>
+                <Link to="/register" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-gold-500 block px-3 py-2">{t('nav.register')}</Link>
+                <Link to="/barber-login" onClick={() => setIsOpen(false)} className="btn-primary block mx-3 text-center">{t('nav.barberLogin')}</Link>
               </>
             )}
             <div className="px-3 py-2">

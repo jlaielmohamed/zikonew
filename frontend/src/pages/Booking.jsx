@@ -268,7 +268,7 @@ export default function Booking() {
                   <p className="text-white"><span className="text-gray-400">{t('booking.barber')}</span> {selectedSlot?.barber_name || selectedBarber?.display_name}</p>
                   <p className="text-white"><span className="text-gray-400">{t('booking.date')}</span> {format(new Date(selectedDate + 'T00:00:00'), t('fmt.longDate'), { locale: dateLocale })}</p>
                   <p className="text-white"><span className="text-gray-400">{t('booking.time')}</span> {format(new Date(selectedSlot?.slot_start), 'HH:mm')}</p>
-                  <p className="text-white"><span className="text-gray-400">{t('booking.price')}</span> {formatPrice(selectedService?.price)}</p>
+                  <p className="text-white"><span className="text-gray-400">{t('booking.price')}</span> {formatPrice(selectedSlot?.slot_price ?? selectedService?.price)}</p>
                 </div>
 
                 {!user && (

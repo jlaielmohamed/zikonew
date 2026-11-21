@@ -52,6 +52,10 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  const refreshProfile = async () => {
+    if (user) await fetchProfile(user.id)
+  }
+
   const signIn = async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     return { data, error }
@@ -91,6 +95,7 @@ export const AuthProvider = ({ children }) => {
     signUp,
     signInWithGoogle,
     signOut,
+    refreshProfile,
     isAdmin: profile?.role === 'admin',
     isBarber: profile?.role === 'barber',
     isCustomer: profile?.role === 'customer'

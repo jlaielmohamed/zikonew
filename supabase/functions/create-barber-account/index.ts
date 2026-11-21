@@ -53,39 +53,79 @@ serve(async (req) => {
 
     const { email, password, full_name, phone, barber_id } = await req.json();
 
-    if (!email || !password || !full_name || !barber_id) {
-      throw new Error("Missing required fields");
+    if (!barber_id) {
+      throw new Error("Missing barber");
     }
 
-    // Create auth user
-    const { data: authData, error: authError } =
-      await supabaseAdmin.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-        user_metadata: { full_name },
-      });
-
-    if (authError) throw authError;
-
-    // Update profile role to barber
-    const { error: profileError } = await supabaseAdmin
-      .from("profiles")
-      .update({ role: "barber", full_name, phone })
-      .eq("id", authData.user.id);
-
-    if (profileError) throw profileError;
-
-    // Link barber profile
-    const { error: barberError } = await supabaseAdmin
+    const { data: barber, error: lookupError } = await supabaseAdmin
       .from("barbers")
-      .update({ profile_id: authData.user.id })
-      .eq("id", barber_id);
+      .select("id, profile_id, display_name")
+      .eq("id", barber_id)
+      .single();
 
-    if (barberError) throw barberError;
+    if (lookupError || !barber) {
+      throw new Error("Barber not found");
+    }
+
+    let userId = barber.profile_id;
+
+    if (!userId) {
+      // No account yet: create one and link it to this barber.
+      if (!email || !password) {
+        throw new Error("Email and password are required for a new barber account");
+      }
+
+      const { data: authData, error: authError } =
+        await supabaseAdmin.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+          user_metadata: { full_name: full_name || barber.display_name },
+        });
+
+      if (authError) throw authError;
+      userId = authData.user.id;
+
+      const { error: profileError } = await supabaseAdmin
+        .from("profiles")
+        .update({ role: "barber", full_name, phone })
+        .eq("id", userId);
+
+      if (profileError) throw profileError;
+
+      const { error: barberError } = await supabaseAdmin
+        .from("barbers")
+        .update({ profile_id: userId })
+        .eq("id", barber_id);
+
+      if (barberError) throw barberError;
+    } else {
+      // Account already linked: Ziko can reset the password or change the email.
+      const authUpdates: Record<string, string> = {};
+      if (email) authUpdates.email = email;
+      if (password) authUpdates.password = password;
+
+      if (Object.keys(authUpdates).length > 0) {
+        const { error: updateError } =
+          await supabaseAdmin.auth.admin.updateUserById(userId, authUpdates);
+        if (updateError) throw updateError;
+      }
+
+      const profileUpdates: Record<string, string> = {};
+      if (full_name) profileUpdates.full_name = full_name;
+      if (phone) profileUpdates.phone = phone;
+
+      if (Object.keys(profileUpdates).length > 0) {
+        const { error: profileError } = await supabaseAdmin
+          .from("profiles")
+          .update(profileUpdates)
+          .eq("id", userId);
+        if (profileError) throw profileError;
+      }
+    }
 
     return new Response(
-      JSON.stringify({ success: true, user_id: authData.user.id }),
+      JSON.stringify({ success: true, user_id: userId }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
