@@ -1,0 +1,11 @@
+# Supabase local/CLI configuration.
+# The booking email function is called by a Supabase Database Webhook (no user
+# JWT), so the platform-level JWT check must be disabled.
+
+project_id = "ziko"
+
+[functions.create-barber-account]
+verify_jwt = false
+
+[functions.send-booking-email]
+verify_jwt = false

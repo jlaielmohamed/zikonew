@@ -28,8 +28,8 @@ A complete barbershop booking platform built with React, Tailwind CSS, and Supab
 ### 2. Run Database Migration
 
 1. Go to your Supabase project → SQL Editor
-2. Copy the entire contents of `supabase/migrations/20251028000000_init_ziko.sql`
-3. Paste and run the SQL
+2. Copy the entire contents of `supabase/migrations/20251028000000_init_ziko.sql` and run it
+3. Then run `supabase/migrations/20251121000000_booking_emails.sql`. It adds `customer_email`, `barber_name` and `service_name` to `bookings` and updates `create_booking`.
 
 ### 3. Create Storage Bucket
 
@@ -38,22 +38,54 @@ A complete barbershop booking platform built with React, Tailwind CSS, and Supab
 3. Make it public
 4. The RLS policies are already included in the migration
 
-### 4. Deploy Edge Function
+### 4. Deploy Edge Functions
 
 1. Install Supabase CLI: `npm install -g supabase`
 2. Login: `supabase login`
 3. Link your project: `supabase link --project-ref YOUR_PROJECT_REF`
-4. Deploy the function: `supabase functions deploy create-barber-account --no-verify-jwt`
-5. Set environment variables in Supabase:
-   - Go to Edge Functions → create-barber-account → Settings
-   - Add secrets: `SUPABASE_SERVICE_ROLE_KEY` (from Settings → API)
+4. Deploy both functions (JWT verification is disabled in `supabase/config.toml`):
+   ```bash
+   supabase functions deploy create-barber-account --no-verify-jwt
+   supabase functions deploy send-booking-email --no-verify-jwt
+   ```
+5. Set the email secrets:
+   ```bash
+   supabase secrets set RESEND_API_KEY=re_...
+   supabase secrets set EMAIL_FROM="Ziko Barbershop <booking@yourdomain.com>"
+   ```
+   The `EMAIL_FROM` domain must be verified in Resend. Dates in the emails use `Africa/Tunis` and the emails are written in French.
+6. The barber emails are already set in `supabase/functions/send-booking-email/index.ts` (Ziko → mohamedjlaiel.pro@gmail.com, Yassine → mohamedjlaiel5000@gmail.com). Routing uses the barber's name; add UUID keys to `BARBER_EMAILS` if you prefer strict ID-based routing.
+
+### Booking email flow
+
+Create one Database Webhook in the Supabase dashboard:
+
+- **Database → Webhooks → Create a new webhook**
+- Name: `booking-emails`
+- Table: `public.bookings`
+- Events: **Insert** and **Update**
+- URL: `https://YOUR_PROJECT_REF.supabase.co/functions/v1/send-booking-email`
+- Method: POST (no auth header needed — `verify_jwt` is disabled)
+
+How it behaves:
+
+- **Insert** (new booking) → emails the selected barber from the `BARBER_EMAILS` map.
+- **Update** where `status` changes to `accepted` or `denied` → emails the address entered in the booking form, with the result and the denial reason if any.
+
+To test manually, call the function with a webhook-shaped body:
+
+```bash
+curl -X POST https://YOUR_PROJECT_REF.supabase.co/functions/v1/send-booking-email \
+  -H "Content-Type: application/json" \
+  -d '{"type":"INSERT","record":{"barber_id":"BARBER_UUID","customer_email":"customer@example.com","guest_name":"John","guest_phone":"0612345678","service_name":"Classic Haircut","starts_at":"2026-11-25T10:00:00Z","price_at_booking":25,"status":"pending"}}'
+```
 
 ### 5. Configure Authentication
 
 1. Go to Authentication → Settings
 2. **Email Auth**: Enable email provider, turn OFF "Confirm email" for instant sign-in
-3. **Google Auth** (optional): Enable Google provider and add OAuth credentials
-4. **Site URL**: Set to your frontend URL (e.g., `http://localhost:5173` for dev, or your deployed URL)
+3. **Google Auth**: Go to Authentication → Providers → Google, enable it, and add your Google OAuth `client_id` and `client_secret` from Google Cloud Console. Add `<SITE_URL>/auth/v1/callback` to the Authorized Redirect URIs in Google Cloud Console (Supabase shows the exact callback URL on the provider page).
+4. **Site URL**: Set to your frontend URL (e.g., `http://localhost:5173` for dev, or your deployed URL). The "Continue with Google" buttons on the sign-in and sign-up pages redirect back to this URL.
 
 ### 6. Create First Admin
 
@@ -115,7 +147,8 @@ npm run build
 
 - **No service role key in frontend** - Only used in Edge Function
 - **Email confirmation disabled** for instant sign-in as requested
-- **No email sending or Google Calendar integration**
+- **Email notifications via Resend**: the barber is emailed on a new booking, and the customer is emailed when the booking is accepted or declined
+- **No Google Calendar integration**
 - **No mock data or local storage for app data**
 - **All business logic in Postgres functions** called via `supabase.rpc()`
 - **RLS enabled on all tables**

@@ -20,6 +20,7 @@ export default function Booking() {
   const [selectedSlot, setSelectedSlot] = useState(null)
   const [guestName, setGuestName] = useState('')
   const [guestPhone, setGuestPhone] = useState('')
+  const [customerEmail, setCustomerEmail] = useState('')
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const [shopSettings, setShopSettings] = useState(null)
@@ -27,6 +28,10 @@ export default function Booking() {
   useEffect(() => {
     fetchData()
   }, [])
+
+  useEffect(() => {
+    if (user?.email) setCustomerEmail(user.email)
+  }, [user])
 
   useEffect(() => {
     if (selectedService && selectedDate) {
@@ -71,7 +76,8 @@ export default function Booking() {
         p_starts_at: selectedSlot.slot_start,
         p_guest_name: user ? null : guestName,
         p_guest_phone: user ? null : guestPhone,
-        p_notes: notes || null
+        p_notes: notes || null,
+        p_customer_email: customerEmail.trim()
       })
       
       if (error) throw error
@@ -90,7 +96,7 @@ export default function Booking() {
     if (step === 2) return true // barber optional (any available)
     if (step === 3) return selectedDate
     if (step === 4) return selectedSlot
-    if (step === 5) return user || (guestName && guestPhone)
+    if (step === 5) return customerEmail && (user || (guestName && guestPhone))
     return false
   }
 
@@ -289,6 +295,19 @@ export default function Booking() {
                     </div>
                   </div>
                 )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">{t('booking.email')}</label>
+                  <input
+                    type="email"
+                    className="input w-full"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    required
+                  />
+                  <p className="text-gray-500 text-xs mt-1">{t('booking.emailHint')}</p>
+                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">{t('booking.notes')}</label>

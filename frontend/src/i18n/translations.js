@@ -61,6 +61,8 @@ export const translations = {
     'booking.price': 'Price:',
     'booking.fullName': 'Full Name *',
     'booking.phone': 'Phone Number *',
+    'booking.email': 'Email Address *',
+    'booking.emailHint': 'We will email you when the barber accepts or declines your booking.',
     'booking.notes': 'Notes (Optional)',
     'booking.back': 'Back',
     'booking.next': 'Next',
@@ -100,6 +102,7 @@ export const translations = {
     'auth.email': 'Email address',
     'auth.password': 'Password',
     'auth.fullName': 'Full Name',
+    'auth.google': 'Continue with Google',
 
     // Admin: common
     'a.loading': 'Loading...',
@@ -279,6 +282,8 @@ export const translations = {
     'booking.price': 'Prix :',
     'booking.fullName': 'Nom complet *',
     'booking.phone': 'Numéro de téléphone *',
+    'booking.email': 'Adresse e-mail *',
+    'booking.emailHint': 'Nous vous enverrons un e-mail lorsque le coiffeur acceptera ou refusera votre réservation.',
     'booking.notes': 'Notes (facultatif)',
     'booking.back': 'Retour',
     'booking.next': 'Suivant',
@@ -318,6 +323,7 @@ export const translations = {
     'auth.email': 'Adresse e-mail',
     'auth.password': 'Mot de passe',
     'auth.fullName': 'Nom complet',
+    'auth.google': 'Continuer avec Google',
 
     // Admin: common
     'a.loading': 'Chargement...',
