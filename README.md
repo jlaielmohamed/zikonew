@@ -9,7 +9,7 @@ A complete barbershop booking platform built with React, Tailwind CSS, and Supab
 - **Customer Portal**: View and cancel bookings with real-time status updates
 - **Admin Dashboard**: Complete shop management with analytics, appointments, services, barbers, etc.
 - **Barber Dashboard**: Accept/decline bookings, manage own prices, offered services, working hours, time off, and login credentials
-- **Barber Accounts**: Ziko creates each barber login from Admin → Barbers; barbers sign in from the "I am a barber" button and can change their email/password afterwards
+- **Barber Accounts**: Ziko creates each barber login from Admin → Barbers; barbers sign in on the single staff login page and can change their email/password afterwards
 - **Real-time Updates**: Live booking notifications and status changes
 - **Role-based Access**: Customer, Barber, and Admin roles
 
@@ -113,7 +113,7 @@ Replace `YOUR_AUTH_USER_UUID` with the actual user ID from Authentication → Us
 1. As Ziko (admin), open **Admin → Barbers** and click **Add barber**.
 2. Fill in the barber's name/bio and the **login email + password** you want him to use. The function creates the Supabase Auth user and links it to the barber profile.
 3. Existing barbers can be edited the same way: use the **Edit** button to link a login or reset a password/email.
-4. The barber clicks **"I am a barber"** on the login page (or in the navbar), signs in, and lands on `/barber`. He can use the password Ziko gave him or **Continue with Google** with that exact same email; Supabase links the Google identity to the same barber account.
+4. The barber signs in on the single `/login` page with the password Ziko gave him, or with **Continue with Google** using that exact same email. The app detects the role and opens `/barber` for him and `/admin` for Ziko.
 5. In his dashboard he can:
    - see **Booking requests** and accept/decline only his own pending bookings (the customer email is sent automatically),
    - choose which shop services he offers and set **his own price and duration** for each,
@@ -186,12 +186,11 @@ npm run build
 
 ## Default Login
 
-After creating your admin account, you can login and access:
-- `/admin` - Admin Dashboard
-- `/barber-login` - Barber sign-in (account created by Ziko)
-- `/barber` - Barber Dashboard (after barber sign-in)
-- `/booking` - Book appointments
-- `/my-bookings` - Customer bookings
+Staff signs in once at `/login`; the app opens the correct dashboard automatically:
+- `/login` - Single sign-in page for Ziko and barbers
+- `/admin` - Admin Dashboard (admin role)
+- `/barber` - Barber Dashboard (barber role)
+- `/booking` - Book appointments (public)
 
 ## Support
 

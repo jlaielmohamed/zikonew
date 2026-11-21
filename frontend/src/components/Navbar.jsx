@@ -40,10 +40,7 @@ export default function Navbar() {
                   <button onClick={handleSignOut} className="btn-primary">{t('nav.signOut')}</button>
                 </>
               ) : (
-                <>
-                  <Link to="/login" className="text-gray-300 hover:text-gold-500 px-3 py-2">{t('nav.login')}</Link>
-                  <Link to="/barber-login" className="btn-primary">{t('nav.barberLogin')}</Link>
-                </>
+                <Link to="/login" className="btn-primary">{t('nav.login')}</Link>
               )}
               <LanguageSwitcher className="ml-2" />
             </div>
@@ -73,10 +70,7 @@ export default function Navbar() {
                 <button onClick={handleSignOut} className="w-full text-left btn-primary mx-3">{t('nav.signOut')}</button>
               </>
             ) : (
-              <>
-                <Link to="/login" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-gold-500 block px-3 py-2">{t('nav.login')}</Link>
-                <Link to="/barber-login" onClick={() => setIsOpen(false)} className="btn-primary block mx-3 text-center">{t('nav.barberLogin')}</Link>
-              </>
+              <Link to="/login" onClick={() => setIsOpen(false)} className="btn-primary block mx-3 text-center">{t('nav.login')}</Link>
             )}
             <div className="px-3 py-2">
               <LanguageSwitcher />

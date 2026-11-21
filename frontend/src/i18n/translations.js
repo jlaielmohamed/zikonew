@@ -93,24 +93,18 @@ export const translations = {
     'status.no_show': 'No show',
 
     // Auth
-    'login.title': 'Sign in to your account',
+    'login.title': 'Ziko staff sign in',
+    'login.subtitle': 'For Ziko and barbers',
     'login.or': 'Or',
     'login.signIn': 'Sign in',
     'login.signingIn': 'Signing in...',
     'login.success': 'Login successful!',
+    'login.staffOnly': 'Only Ziko and barber accounts can sign in here. Ask Ziko for access.',
+    'login.googleHint': 'Use the Google email registered for your staff account.',
     'auth.email': 'Email address',
     'auth.password': 'Password',
     'auth.fullName': 'Full Name',
     'auth.google': 'Continue with Google',
-    'nav.barberLogin': 'I am a barber',
-
-    // Barber login
-    'barberLogin.title': 'Barber login',
-    'barberLogin.subtitle': 'Sign in with the account Ziko created for you',
-    'barberLogin.signIn': 'Go to my dashboard',
-    'barberLogin.signingIn': 'Signing in...',
-    'barberLogin.wrongRole': 'This account is not a barber account. Ask Ziko for access.',
-    'barberLogin.googleHint': 'Use the same Google email Ziko registered for you.',
 
     // Barber dashboard
     'b.menu.appointments': 'Appointments',
@@ -399,24 +393,18 @@ export const translations = {
     'status.no_show': 'Absent',
 
     // Auth
-    'login.title': 'Connectez-vous à votre compte',
+    'login.title': 'Connexion du personnel Ziko',
+    'login.subtitle': 'Pour Ziko et les coiffeurs',
     'login.or': 'Ou',
     'login.signIn': 'Se connecter',
     'login.signingIn': 'Connexion...',
     'login.success': 'Connexion réussie !',
+    'login.staffOnly': 'Seuls les comptes Ziko et coiffeur peuvent se connecter ici. Demandez l’accès à Ziko.',
+    'login.googleHint': 'Utilisez l’adresse Google enregistrée pour votre compte personnel.',
     'auth.email': 'Adresse e-mail',
     'auth.password': 'Mot de passe',
     'auth.fullName': 'Nom complet',
     'auth.google': 'Continuer avec Google',
-    'nav.barberLogin': 'Je suis coiffeur',
-
-    // Barber login
-    'barberLogin.title': 'Espace coiffeur',
-    'barberLogin.subtitle': 'Connectez-vous avec le compte créé par Ziko',
-    'barberLogin.signIn': 'Accéder à mon espace',
-    'barberLogin.signingIn': 'Connexion...',
-    'barberLogin.wrongRole': 'Ce compte n’est pas un compte coiffeur. Demandez l’accès à Ziko.',
-    'barberLogin.googleHint': 'Utilisez la même adresse Google que celle enregistrée par Ziko.',
 
     // Barber dashboard
     'b.menu.appointments': 'Rendez-vous',

@@ -1,39 +1,78 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 import { useLanguage } from '../i18n/LanguageContext'
+import {
+  STAFF_GOOGLE_LOGIN_FLAG,
+  STAFF_LOGIN_WRONG_ROLE_FLAG,
+} from '../config/authFlags'
+
+const dashboardPath = (role) => {
+  if (role === 'admin') return '/admin'
+  if (role === 'barber') return '/barber'
+  return null
+}
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const { signIn, signInWithGoogle } = useAuth()
+  const { signIn, signOut, signInWithGoogle } = useAuth()
   const { t } = useLanguage()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (sessionStorage.getItem(STAFF_LOGIN_WRONG_ROLE_FLAG) === '1') {
+      sessionStorage.removeItem(STAFF_LOGIN_WRONG_ROLE_FLAG)
+      toast.error(t('login.staffOnly'))
+    }
+  }, [t])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
 
-    const { error } = await signIn(email, password)
-    
-    if (error) {
-      toast.error(error.message)
-    } else {
+    try {
+      const { data, error } = await signIn(email.trim(), password)
+      if (error) throw error
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single()
+
+      if (profileError) throw profileError
+
+      const path = dashboardPath(profile?.role)
+      if (!path) {
+        await signOut()
+        toast.error(t('login.staffOnly'))
+        return
+      }
+
       toast.success(t('login.success'))
-      navigate('/')
+      navigate(path)
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setLoading(false)
     }
-    
-    setLoading(false)
   }
 
   const handleGoogle = async () => {
     setLoading(true)
 
+    // Supabase only allows the site root as a redirect URL, so AppRoutes uses
+    // this flag to send staff to the correct dashboard after the redirect.
+    sessionStorage.setItem(STAFF_GOOGLE_LOGIN_FLAG, '1')
+
     const { error } = await signInWithGoogle()
 
     if (error) {
+      sessionStorage.removeItem(STAFF_GOOGLE_LOGIN_FLAG)
       toast.error(error.message)
       setLoading(false)
     }
@@ -48,12 +87,9 @@ export default function Login() {
             <img src="/logo.jpg" alt="Ziko Hairstyle" className="h-20 w-20 rounded-full object-cover" />
           </div>
           <h2 className="mt-6 text-3xl font-bold text-white">{t('login.title')}</h2>
-          <div className="mt-4">
-            <Link to="/barber-login" className="btn-secondary w-full max-w-xs text-center block mx-auto">
-              {t('nav.barberLogin')}
-            </Link>
-          </div>
+          <p className="mt-2 text-sm text-gray-400">{t('login.subtitle')}</p>
         </div>
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
@@ -117,6 +153,9 @@ export default function Login() {
             </svg>
             {t('auth.google')}
           </button>
+          <p className="text-center text-xs text-gray-500 mt-2">
+            {t('login.googleHint')}
+          </p>
         </div>
       </div>
     </div>
