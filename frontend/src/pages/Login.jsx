@@ -7,6 +7,7 @@ import { useLanguage } from '../i18n/LanguageContext'
 import {
   STAFF_GOOGLE_LOGIN_FLAG,
   STAFF_LOGIN_WRONG_ROLE_FLAG,
+  SESSION_EXPIRED_FLAG,
 } from '../config/authFlags'
 
 const dashboardPath = (role) => {
@@ -27,6 +28,10 @@ export default function Login() {
     if (sessionStorage.getItem(STAFF_LOGIN_WRONG_ROLE_FLAG) === '1') {
       sessionStorage.removeItem(STAFF_LOGIN_WRONG_ROLE_FLAG)
       toast.error(t('login.staffOnly'))
+    }
+    if (sessionStorage.getItem(SESSION_EXPIRED_FLAG) === '1') {
+      sessionStorage.removeItem(SESSION_EXPIRED_FLAG)
+      toast.error(t('login.sessionExpired'))
     }
   }, [t])
 
