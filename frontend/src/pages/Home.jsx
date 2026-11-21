@@ -12,8 +12,8 @@ const MAPS_LNG = 10.7804827
 const MAPS_EMBED_URL = `https://maps.google.com/maps?q=${MAPS_LAT},${MAPS_LNG}&z=17&output=embed`
 
 // Social profile links used by the footer icons.
-const FACEBOOK_URL = '#'
-const INSTAGRAM_URL = '#'
+const FACEBOOK_URL = 'https://www.facebook.com/wassim.zekri.9'
+const INSTAGRAM_URL = 'https://www.instagram.com/ziko_hairstyle/'
 
 export default function Home() {
   const { isBarber } = useAuth()
