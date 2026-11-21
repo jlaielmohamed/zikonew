@@ -32,6 +32,7 @@ A complete barbershop booking platform built with React, Tailwind CSS, and Supab
 2. Copy the entire contents of `supabase/migrations/20251028000000_init_ziko.sql` and run it
 3. Then run `supabase/migrations/20251121000000_booking_emails.sql`. It adds `customer_email`, `barber_name` and `service_name` to `bookings` and updates `create_booking`.
 4. Then run `supabase/migrations/20251122000000_barber_self_service.sql`. It adds per-barber prices/durations to `barber_services`, updates `get_available_slots` and `create_booking` to use them, and seeds a schedule when a new barber is added.
+5. Then run `supabase/migrations/20251123000000_fix_booking_slots.sql`. It offers every active service to every active barber (fixing empty hours for services such as `Beard + Brushing`), auto-offers future services, and interprets working hours in `Africa/Tunis`.
 
 ### 3. Create Storage Bucket
 

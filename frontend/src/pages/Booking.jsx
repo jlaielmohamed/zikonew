@@ -8,6 +8,16 @@ import { TURNSTILE_SITE_KEY } from '../config/turnstile'
 
 const TURNSTILE_SCRIPT_ID = 'cf-turnstile-script'
 
+// Slots are generated in Africa/Tunis. Format them there explicitly so the
+// displayed hour is correct even if the visitor's browser uses another zone.
+const slotTimeFormatter = new Intl.DateTimeFormat('fr-FR', {
+  timeZone: 'Africa/Tunis',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+})
+const formatSlotTime = (value) => slotTimeFormatter.format(new Date(value))
+
 export default function Booking() {
   const { user, profile } = useAuth()
   const { t, formatPrice, dateLocale } = useLanguage()
@@ -18,6 +28,7 @@ export default function Booking() {
   const [selectedBarber, setSelectedBarber] = useState(null)
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [availableSlots, setAvailableSlots] = useState([])
+  const [loadingSlots, setLoadingSlots] = useState(false)
   const [selectedSlot, setSelectedSlot] = useState(null)
   const [guestName, setGuestName] = useState('')
   const [guestPhone, setGuestPhone] = useState('')
@@ -106,12 +117,6 @@ export default function Booking() {
     }
   }, [step, bookingDone, resetTurnstile])
 
-  useEffect(() => {
-    if (selectedService && selectedDate) {
-      fetchSlots()
-    }
-  }, [selectedService, selectedBarber, selectedDate])
-
   const fetchData = async () => {
     const [servicesRes, barbersRes, settingsRes] = await Promise.all([
       supabase.from('services').select('*').eq('is_active', true).order('sort_order'),
@@ -123,18 +128,75 @@ export default function Booking() {
     if (settingsRes.data) setShopSettings(settingsRes.data)
   }
 
-  const fetchSlots = async () => {
+  const fetchSlotsForDate = async (date, service = selectedService, barber = selectedBarber) => {
+    if (!service) return []
+    const { data, error } = await supabase.rpc('get_available_slots', {
+      p_barber_id: barber?.id || null,
+      p_service_id: service.id,
+      p_date: date
+    })
+    if (error) throw error
+    return data || []
+  }
+
+  // Start on a day that actually has hours instead of today when the minimum
+  // notice has already passed or the shop is closed.
+  const findBookableDate = async (service, barber) => {
+    const candidateDates = Array.from({ length: 16 }, (_, i) =>
+      format(addDays(new Date(), i), 'yyyy-MM-dd')
+    )
+
+    for (const date of candidateDates) {
+      try {
+        const slots = await fetchSlotsForDate(date, service, barber)
+        if (slots.length > 0) return { date, slots }
+      } catch (error) {
+        console.error('Error fetching slots:', error)
+        toast.error(t('booking.slotsError'))
+        break
+      }
+    }
+
+    return { date: candidateDates[0], slots: [] }
+  }
+
+  const handleServiceSelect = async (service) => {
+    setSelectedService(service)
+    setSelectedSlot(null)
+    setLoadingSlots(true)
+    const { date, slots } = await findBookableDate(service, selectedBarber)
+    setSelectedDate(date)
+    setAvailableSlots(slots)
+    setLoadingSlots(false)
+  }
+
+  const handleBarberSelect = async (barber) => {
+    setSelectedBarber(barber)
+    setSelectedSlot(null)
+    if (!selectedService) return
+
+    setLoadingSlots(true)
+    const { date, slots } = await findBookableDate(selectedService, barber)
+    setSelectedDate(date)
+    setAvailableSlots(slots)
+    setLoadingSlots(false)
+  }
+
+  const handleDateSelect = async (date) => {
+    setSelectedDate(date)
+    setSelectedSlot(null)
+    if (!selectedService) return
+
+    setLoadingSlots(true)
     try {
-      const { data, error } = await supabase.rpc('get_available_slots', {
-        p_barber_id: selectedBarber?.id || null,
-        p_service_id: selectedService.id,
-        p_date: selectedDate
-      })
-      if (error) throw error
-      setAvailableSlots(data || [])
+      const slots = await fetchSlotsForDate(date, selectedService, selectedBarber)
+      setAvailableSlots(slots)
     } catch (error) {
       console.error('Error fetching slots:', error)
       toast.error(t('booking.slotsError'))
+      setAvailableSlots([])
+    } finally {
+      setLoadingSlots(false)
     }
   }
 
@@ -217,6 +279,7 @@ export default function Booking() {
     setSelectedBarber(null)
     setSelectedSlot(null)
     setAvailableSlots([])
+    setLoadingSlots(false)
     setGuestName('')
     setGuestPhone('')
     setNotes('')
@@ -276,7 +339,7 @@ export default function Booking() {
                 {services.map((service) => (
                   <div
                     key={service.id}
-                    onClick={() => setSelectedService(service)}
+                    onClick={() => handleServiceSelect(service)}
                     className={`p-4 border rounded cursor-pointer transition-colors ${
                       selectedService?.id === service.id 
                         ? 'border-gold-500 bg-dark-700' 
@@ -305,7 +368,7 @@ export default function Booking() {
               <h2 className="text-xl font-semibold mb-4">{t('booking.selectBarber')}</h2>
               <div className="space-y-3">
                 <div
-                  onClick={() => setSelectedBarber(null)}
+                  onClick={() => handleBarberSelect(null)}
                   className={`p-4 border rounded cursor-pointer transition-colors ${
                     selectedBarber === null 
                       ? 'border-gold-500 bg-dark-700' 
@@ -318,7 +381,7 @@ export default function Booking() {
                 {barbers.map((barber) => (
                   <div
                     key={barber.id}
-                    onClick={() => setSelectedBarber(barber)}
+                    onClick={() => handleBarberSelect(barber)}
                     className={`p-4 border rounded cursor-pointer transition-colors ${
                       selectedBarber?.id === barber.id 
                         ? 'border-gold-500 bg-dark-700' 
@@ -350,7 +413,7 @@ export default function Booking() {
                 {dates.slice(0, 16).map((date) => (
                   <button
                     key={date}
-                    onClick={() => setSelectedDate(date)}
+                    onClick={() => handleDateSelect(date)}
                     className={`p-3 border rounded text-center transition-colors ${
                       selectedDate === date
                         ? 'border-gold-500 bg-gold-500 text-black'
@@ -369,7 +432,9 @@ export default function Booking() {
           {step === 4 && (
             <div>
               <h2 className="text-xl font-semibold mb-4">{t('booking.selectTime')}</h2>
-              {availableSlots.length === 0 ? (
+              {loadingSlots ? (
+                <p className="text-gray-400 text-center py-8">{t('booking.loadingSlots')}</p>
+              ) : availableSlots.length === 0 ? (
                 <p className="text-gray-400 text-center py-8">{t('booking.noSlots')}</p>
               ) : (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -384,7 +449,7 @@ export default function Booking() {
                       }`}
                     >
                       <div className="font-semibold">
-                        {format(new Date(slot.slot_start), 'HH:mm')}
+                        {formatSlotTime(slot.slot_start)}
                       </div>
                       {selectedBarber === null && (
                         <div className="text-xs opacity-75">{slot.barber_name}</div>
@@ -406,7 +471,7 @@ export default function Booking() {
                   <p className="text-white"><span className="text-gray-400">{t('booking.service')}</span> {selectedService?.name}</p>
                   <p className="text-white"><span className="text-gray-400">{t('booking.barber')}</span> {selectedSlot?.barber_name || selectedBarber?.display_name}</p>
                   <p className="text-white"><span className="text-gray-400">{t('booking.date')}</span> {format(new Date(selectedDate + 'T00:00:00'), t('fmt.longDate'), { locale: dateLocale })}</p>
-                  <p className="text-white"><span className="text-gray-400">{t('booking.time')}</span> {format(new Date(selectedSlot?.slot_start), 'HH:mm')}</p>
+                  <p className="text-white"><span className="text-gray-400">{t('booking.time')}</span> {formatSlotTime(selectedSlot?.slot_start)}</p>
                   <p className="text-white"><span className="text-gray-400">{t('booking.price')}</span> {formatPrice(selectedSlot?.slot_price ?? selectedService?.price)}</p>
                 </div>
 
