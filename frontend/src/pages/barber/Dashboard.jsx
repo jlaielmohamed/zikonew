@@ -157,9 +157,20 @@ export default function BarberDashboard() {
   return (
     <div className="min-h-screen bg-dark-900 py-8 px-4">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-white">{t('b.title')}</h1>
-          <p className="text-gray-400">{t('b.welcome')} {barber.display_name}</p>
+        <div className="flex items-start justify-between gap-3 mb-6">
+          <div className="min-w-0">
+            <h1 className="text-3xl font-bold text-white">{t('b.title')}</h1>
+            <p className="text-gray-400">{t('b.welcome')} {barber.display_name}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setTab('account')}
+            className="sm:hidden p-2 text-gold-500 hover:bg-dark-700 rounded flex-shrink-0"
+            aria-label={t('b.menu.account')}
+            title={t('b.menu.account')}
+          >
+            <User className="h-6 w-6" />
+          </button>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-8">

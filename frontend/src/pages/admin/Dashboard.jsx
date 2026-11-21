@@ -130,7 +130,14 @@ export default function AdminDashboard() {
           <Menu className="h-6 w-6" />
         </button>
         <span className="text-lg font-bold text-white truncate">{t('nav.adminDashboard')}</span>
-        <span className="w-10 flex-shrink-0" />
+        <Link
+          to="/admin/account"
+          className="p-2 text-gold-500 hover:bg-dark-700 rounded flex-shrink-0"
+          aria-label={t('a.menu.account')}
+          title={t('a.menu.account')}
+        >
+          <User className="h-6 w-6" />
+        </Link>
       </div>
 
       <div className="flex">
