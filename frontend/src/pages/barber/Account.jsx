@@ -44,10 +44,11 @@ export default function BarberAccount() {
         if (error) throw error
       }
 
+      const emailChanged =
+        newEmail.trim() && newEmail.trim().toLowerCase() !== user.email?.toLowerCase()
+
       const authUpdates = {}
-      if (newEmail.trim() && newEmail.trim().toLowerCase() !== user.email?.toLowerCase()) {
-        authUpdates.email = newEmail.trim()
-      }
+      if (emailChanged) authUpdates.email = newEmail.trim()
       if (newPassword) authUpdates.password = newPassword
 
       if (Object.keys(authUpdates).length > 0) {
@@ -59,7 +60,7 @@ export default function BarberAccount() {
       setNewEmail('')
       setNewPassword('')
       setConfirmPassword('')
-      toast.success(t('b.ac.saved'))
+      toast.success(emailChanged ? t('b.ac.emailSent') : t('b.ac.saved'))
     } catch (error) {
       toast.error(error.message)
     } finally {
