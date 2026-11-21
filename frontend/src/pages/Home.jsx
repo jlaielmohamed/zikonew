@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
 import { useLanguage } from '../i18n/LanguageContext'
 import { Scissors, Clock, MapPin, Phone, Instagram, Facebook, ExternalLink } from 'lucide-react'
 
@@ -11,6 +12,7 @@ const MAPS_LNG = 10.7804827
 const MAPS_EMBED_URL = `https://maps.google.com/maps?q=${MAPS_LAT},${MAPS_LNG}&z=17&output=embed`
 
 export default function Home() {
+  const { isBarber } = useAuth()
   const { t, formatPrice } = useLanguage()
   const [shopSettings, setShopSettings] = useState(null)
   const [services, setServices] = useState([])
@@ -77,9 +79,15 @@ export default function Home() {
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
             {shopSettings?.description || t('home.defaultDescription')}
           </p>
-          <Link to="/booking" className="btn-primary text-lg px-8 py-3 inline-block">
-            {t('home.bookNow')}
-          </Link>
+          {isBarber ? (
+            <Link to="/barber" className="btn-primary text-lg px-8 py-3 inline-block">
+              {t('nav.barberDashboard')}
+            </Link>
+          ) : (
+            <Link to="/booking" className="btn-primary text-lg px-8 py-3 inline-block">
+              {t('home.bookNow')}
+            </Link>
+          )}
         </div>
       </section>
 
@@ -240,15 +248,17 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-gold-600 to-gold-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-black mb-4">{t('home.ctaTitle')}</h2>
-          <p className="text-xl text-black mb-8">{t('home.ctaText')}</p>
-          <Link to="/booking" className="bg-black text-white hover:bg-gray-900 font-semibold py-3 px-8 rounded transition-colors inline-block">
-            {t('home.bookNow')}
-          </Link>
-        </div>
-      </section>
+      {!isBarber && (
+        <section className="py-16 bg-gradient-to-r from-gold-600 to-gold-500">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl font-bold text-black mb-4">{t('home.ctaTitle')}</h2>
+            <p className="text-xl text-black mb-8">{t('home.ctaText')}</p>
+            <Link to="/booking" className="bg-black text-white hover:bg-gray-900 font-semibold py-3 px-8 rounded transition-colors inline-block">
+              {t('home.bookNow')}
+            </Link>
+          </div>
+        </section>
+      )}
     </div>
   )
 }
